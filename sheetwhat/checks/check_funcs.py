@@ -1,5 +1,6 @@
-from .utils import crop_by_range
+from .utils import crop_by_range, is_empty, round_array_2d, normalize_array_2d
 import copy
+import re
 
 
 def has_code(
@@ -13,33 +14,46 @@ def has_code(
 
     return state
 
-def round_array_2d(array_2d, ndigits):
-    return [ [ round(x, ndigits) if isinstance(x, (int, float)) else x for x in row ] for row in array_2d ]
 
-def is_empty_2d(x):
-    return False
-    # return all(map(is_empty, x) if isinstance(x, list) else x
+def check_range(state, field, field_msg, missing_msg=None):
 
-def check_range(state, missing_msg=None):
+    student_field_content = crop_by_range(state.student_data[field], state.sct_range)
+    solution_field_content = crop_by_range(state.solution_data[field], state.sct_range)
 
-    student_values = crop_by_range(state.student_data["values"], state.sct_range)
-    solution_values = crop_by_range(state.solution_data["values"], state.sct_range)
+    if is_empty(student_field_content) and not is_empty(solution_field_content):
+        _msg = (
+            missing_msg
+            or f"Please fill in a {field_msg} in `{state.sct_range}` to complete the exercise."
+        )
+        state.do_test(_msg)
 
-    if is_empty_2d(student_values) and not is_empty_2d(solution_values):
-       _msg = missing_msg or f"Please fill in `{state.sct_range}` to complete the exercise."
-       state.do_test(_msg)
+    return state.to_child(
+        {**copy.deepcopy(state.student_data), field: student_field_content},
+        {**copy.deepcopy(state.solution_data), field: solution_field_content},
+    )
 
-    return state.to_child({** copy.deepcopy(state.student_data), 'values': student_values},
-                          {** copy.deepcopy(state.solution_data), 'values': solution_values})
 
 def has_equal_value(state, incorrect_msg=None, ndigits=4):
-    child = check_range(state)
+    child = check_range(state, field="values", field_msg="value")
 
-    student_values_rounded = round_array_2d(child.student_data['values'], ndigits)
-    solution_values_rounded = round_array_2d(child.solution_data['values'], ndigits)
+    student_values_rounded = round_array_2d(child.student_data["values"], ndigits)
+    solution_values_rounded = round_array_2d(child.solution_data["values"], ndigits)
 
     if student_values_rounded != solution_values_rounded:
         _msg = incorrect_msg or f"The value at `{state.sct_range}` is not correct."
+        state.do_test(_msg)
+
+    return state
+
+
+def has_equal_formula(state, incorrect_msg=None, ndigits=4):
+    child = check_range(state, field="formulas", field_msg="formula")
+
+    student_formulas_normalized = normalize_array_2d(child.student_data["formulas"])
+    solution_formulas_normalized = normalize_array_2d(child.solution_data["formulas"])
+
+    if student_formulas_normalized != solution_formulas_normalized:
+        _msg = incorrect_msg or f"The formula at `{state.sct_range}` is not correct."
         state.do_test(_msg)
 
     return state

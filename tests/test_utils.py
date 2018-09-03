@@ -4,6 +4,8 @@ from sheetwhat.checks.utils import (
     letters_to_numbers,
     range_to_row_columns,
     crop_by_range,
+    is_empty,
+    normalize_array_2d,
 )
 
 
@@ -66,3 +68,34 @@ def test_crop_by_range_deepcopy():
     b = crop_by_range([[obj]], "A1")
     b[0][0]["test"] = "that"
     assert obj["test"] == "what"
+
+
+@pytest.mark.parametrize(
+    "obj, empty",
+    [
+        (None, True),
+        ("", True),
+        (0, False),
+        (1, False),
+        ([[{}]], True),
+        ([[{"name": "pivot table 1"}]], False),
+        ([[]], True),
+        ([[""]], True),
+        ([[0]], False),
+        ([""], True),
+    ],
+)
+def test_is_empty(obj, empty):
+    assert is_empty(obj) == empty
+
+
+@pytest.mark.parametrize(
+    "array_2d, target",
+    [
+        ([["TestEn"]], [["testen"]]),
+        ([["een BEETJE TeStEn"]], [["eenbeetjetesten"]]),
+        ([[0]], [[0]]),
+    ],
+)
+def test_normalize_array_2d(array_2d, target):
+    assert normalize_array_2d(array_2d) == target

@@ -1,4 +1,9 @@
-from sheetwhat.checks.check_funcs import has_code, check_range, has_equal_value
+from sheetwhat.checks.check_funcs import (
+    has_code,
+    check_range,
+    has_equal_value,
+    has_equal_formula,
+)
 
 # don't import some funcs from protowhat that don't make sense:
 # - check_node, check_edge and has_equal_ast don't work well.
