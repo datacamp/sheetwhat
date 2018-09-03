@@ -6,6 +6,7 @@ from sheetwhat.checks.utils import (
     crop_by_range,
     is_empty,
     normalize_array_2d,
+    map_2d,
 )
 
 
@@ -99,3 +100,15 @@ def test_is_empty(obj, empty):
 )
 def test_normalize_array_2d(array_2d, target):
     assert normalize_array_2d(array_2d) == target
+
+
+@pytest.mark.parametrize(
+    "array_2d, func, target",
+    [
+        ([["TestEn"]], lambda x: x.lower(), [["testen"]]),
+        ([["een BEETJE TeStEn"]], lambda x: x.upper(), [["EEN BEETJE TESTEN"]]),
+        ([[0, 1], [2, 3]], lambda x: x + 1, [[1, 2], [3, 4]]),
+    ],
+)
+def test_map_2d(array_2d, func, target):
+    assert map_2d(func, array_2d) == target

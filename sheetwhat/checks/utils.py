@@ -65,10 +65,8 @@ def is_empty(x):
 
 
 def round_array_2d(array_2d, ndigits):
-    return [
-        [round(x, ndigits) if isinstance(x, (int, float)) else x for x in row]
-        for row in array_2d
-    ]
+    round_value = lambda x: round(x, ndigits) if isinstance(x, (int, float)) else x
+    return map_2d(round_value, array_2d)
 
 
 def normalize_array_2d(array_2d):
@@ -77,5 +75,8 @@ def normalize_array_2d(array_2d):
         if isinstance(formula, str)
         else formula
     )
+    return map_2d(normalize, array_2d)
 
-    return [[normalize(cell) for cell in row] for row in array_2d]
+
+def map_2d(func, array_2d):
+    return [[func(cell) for cell in row] for row in array_2d]
