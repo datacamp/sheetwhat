@@ -22,7 +22,7 @@ def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x
     student_formulas_normalized = map_2d(normalize, child.student_data["formulas"])
     student_matches = map_2d(match, student_formulas_normalized)
 
-    if sum([sum(row) for row in student_matches]) == 0:
+    if not all([all(row) for row in student_matches]):
         _msg = incorrect_msg or f"The formula at `{child.sct_range}` is not correct."
         child.do_test(_msg)
 
@@ -46,7 +46,7 @@ def check_range(state, field, field_msg, missing_msg=None):
     student_field_content = crop_by_range(state.student_data[field], state.sct_range)
     solution_field_content = crop_by_range(state.solution_data[field], state.sct_range)
 
-    if is_empty(student_field_content) and not is_empty(solution_field_content):
+    if is_empty(student_field_content):
         _msg = (
             missing_msg
             or f"Please fill in a {field_msg} in `{state.sct_range}` to complete the exercise."
