@@ -29,6 +29,7 @@ def solution_data_normalize():
     [
         ("A1", "SUM", True),
         ("A1", "TEST", False),
+        ("C2", "VAR", False),
         ("B3", "VAR", False),
         ("A2", "EXP", False),
         ("A2", "AVERAGE", True),
@@ -39,7 +40,7 @@ def solution_data_normalize():
 )
 def test_check_function(solution_data, sct_range, function, correct):
     user_data = deepcopy(solution_data)
-    sct = [{"range": sct_range, "sct": [f'check_function(function = "{function}")']}]
+    sct = [{"range": sct_range, "sct": [f'Ex().check_function(name = "{function}")']}]
 
     assert try_exercise(solution_data, user_data, sct)["success"] == correct
 
@@ -59,15 +60,16 @@ def test_check_function(solution_data, sct_range, function, correct):
 )
 def test_check_function_normalize(solution_data, sct_range, function, correct):
     user_data = deepcopy(solution_data)
-    sct = [{"range": sct_range, "sct": [f'check_function(function = "{function}")']}]
+    sct = [{"range": sct_range, "sct": [f'Ex().check_function(name = "{function}")']}]
 
     assert try_exercise(solution_data, user_data, sct)["success"] == correct
 
 
-def test_check_function_suggestion(solution_data):
-    user_data = deepcopy(solution_data)
-    sct = [{"range": "A1", "sct": ['check_function(function = "AVERAGE")']}]
-
-    assert try_exercise(solution_data, user_data, sct)["message"].endswith(
-        "Did you use the `AVERAGE()` function?"
-    )
+# TODO: part of messaging
+# def test_check_function_suggestion(solution_data):
+#    user_data = deepcopy(solution_data)
+#    sct = [{"range": "A1", "sct": ['Ex().check_function(name = "AVERAGE")']}]
+#
+#    assert try_exercise(solution_data, user_data, sct)["message"].endswith(
+#        "Did you use the `AVERAGE()` function?"
+#    )
