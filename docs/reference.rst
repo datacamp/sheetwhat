@@ -3,6 +3,15 @@ Checks
 
 .. autofunction:: sheetwhat.checks.check_funcs.has_code
 
+.. autofunction:: sheetwhat.checks.check_funcs.check_function
+
+.. autofunction:: sheetwhat.checks.check_funcs.check_operator
+
+.. autofunction:: sheetwhat.checks.check_funcs.has_equal_value
+
+.. autofunction:: sheetwhat.checks.check_funcs.has_equal_formula
+
+
 Logic
 -----
 

@@ -1,6 +1,7 @@
 from protowhat.State import State as BaseState
 import copy
 
+
 class State(BaseState):
     def __init__(self, student_data, solution_data, sct_range, reporter):
         self.student_data = student_data

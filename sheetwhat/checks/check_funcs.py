@@ -10,6 +10,21 @@ import copy
 import re
 
 
+def check_range(state, field, field_msg, missing_msg=None):
+
+    student_field_content = crop_by_range(state.student_data[field], state.sct_range)
+    solution_field_content = crop_by_range(state.solution_data[field], state.sct_range)
+
+    if is_empty(student_field_content):
+        _msg = missing_msg or f"Please fill in a {field_msg} in `{state.sct_range}`."
+        state.do_test(_msg)
+
+    return state.to_child(
+        {**copy.deepcopy(state.student_data), field: student_field_content},
+        {**copy.deepcopy(state.solution_data), field: solution_field_content},
+    )
+
+
 def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x: x):
     child = check_range(state, field="formulas", field_msg="formula")
 
@@ -23,40 +38,45 @@ def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x
     student_matches = map_2d(match, student_formulas_normalized)
 
     if not all([all(row) for row in student_matches]):
-        _msg = incorrect_msg or f"The formula at `{child.sct_range}` is not correct."
+        _msg = (
+            incorrect_msg
+            or f"In cell `{state.sct_range}`, did you use the correct formula?"
+        )
         child.do_test(_msg)
 
     return state
 
 
 def check_function(state, name, missing_msg=None):
-    has_code(state, pattern=name, fixed=True, normalize=normalize_formula)
+    missing_msg = (
+        missing_msg
+        or f"In cell `{state.sct_range}`, did you use the `{name}()` function?"
+    )
+    has_code(
+        state,
+        pattern=name,
+        fixed=True,
+        incorrect_msg=missing_msg,
+        normalize=normalize_formula,
+    )
     # Don't return state; chaining not implemented yet
     return None
 
 
 def check_operator(state, operator, missing_msg=None):
-    has_code(state, pattern=operator, fixed=True, normalize=normalize_formula)
+    missing_msg = (
+        missing_msg
+        or f"In cell `{state.sct_range}`, did you use the `{operator}` operator?"
+    )
+    has_code(
+        state,
+        pattern=operator,
+        fixed=True,
+        incorrect_msg=missing_msg,
+        normalize=normalize_formula,
+    )
     # Don't return state; chaining not implemented yet
     return None
-
-
-def check_range(state, field, field_msg, missing_msg=None):
-
-    student_field_content = crop_by_range(state.student_data[field], state.sct_range)
-    solution_field_content = crop_by_range(state.solution_data[field], state.sct_range)
-
-    if is_empty(student_field_content):
-        _msg = (
-            missing_msg
-            or f"Please fill in a {field_msg} in `{state.sct_range}` to complete the exercise."
-        )
-        state.do_test(_msg)
-
-    return state.to_child(
-        {**copy.deepcopy(state.student_data), field: student_field_content},
-        {**copy.deepcopy(state.solution_data), field: solution_field_content},
-    )
 
 
 def has_equal_value(state, incorrect_msg=None, ndigits=4):
@@ -79,7 +99,10 @@ def has_equal_formula(state, incorrect_msg=None, ndigits=4):
     solution_formulas_normalized = normalize_array_2d(child.solution_data["formulas"])
 
     if student_formulas_normalized != solution_formulas_normalized:
-        _msg = incorrect_msg or f"The formula at `{child.sct_range}` is not correct."
+        _msg = (
+            incorrect_msg
+            or f"In cell `{state.sct_range}`, did you use the correct formula?"
+        )
         child.do_test(_msg)
 
     return state

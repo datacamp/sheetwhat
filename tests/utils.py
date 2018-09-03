@@ -2,10 +2,34 @@ import requests
 import pytest
 import json
 
+
+from sheetwhat.State import State
+from protowhat.Reporter import Reporter
+from protowhat.Test import TestFail as TF
+
 from functools import reduce
 from copy import deepcopy
+from contextlib import contextmanager
 
-ENDPOINT = "http://localhost:3000/sheets/test-exercise"
+def setup_state(stu, sol, sct_range):
+    return State(stu, sol, sct_range, reporter=Reporter())
+
+@contextmanager
+def verify_success(should_pass):
+    if should_pass:
+        yield
+    else:
+        with pytest.raises(TF):
+            yield
+
+
+
+def try_exercise(solution_data, user_data, sct):
+    from sheetwhat.test_exercise import test_exercise
+
+    result = test_exercise(sct, user_data, solution_data)
+
+    return {"success": result.get("correct", False), "message": result.get("message")}
 
 
 class Identity:
@@ -73,14 +97,6 @@ class Deletion:
             i += 1
         del nested_obj[self.path[i]]
         return copy
-
-
-def try_exercise(solution_data, user_data, sct):
-    from sheetwhat.test_exercise import test_exercise
-
-    result = test_exercise(sct, user_data, solution_data)
-
-    return {"success": result.get("correct", False), "message": result.get("message")}
 
 
 def compose(*functions):
