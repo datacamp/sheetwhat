@@ -5,7 +5,7 @@ from utils import Identity, Mutation, try_exercise, compose
 
 # Fixtures
 @pytest.fixture()
-def solution_data():
+def user_data_seed():
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
@@ -40,8 +40,25 @@ def solution_data():
         ),
     ],
 )
-def test_check_regex(solution_data, trans, sct_range, pattern, correct):
-    user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": [f'check_regex(pattern = "{pattern}")']}]
+def test_check_regex(user_data_seed, trans, sct_range, pattern, correct):
+    user_data = trans(deepcopy(user_data_seed))
+    sct = [{"range": sct_range, "sct": [f'Ex().has_code("{pattern}")']}]
 
-    assert try_exercise(solution_data, user_data, sct)["success"] == correct
+    # Does not depend on solution_data
+    assert try_exercise(user_data, user_data, sct)["success"] == correct
+
+
+@pytest.mark.parametrize(
+    "trans, sct_range, pattern, correct",
+    [
+        (Mutation(["formulas", 0, 0], "dees+"), "A1", "dees+", True),
+        (Mutation(["formulas", 0, 0], "deesssss"), "A1", "dees+", False),
+        (Mutation(["formulas", 0, 0], "dees"), "A1", "dees+", False),
+    ],
+)
+def test_check_regex_fixed(user_data_seed, trans, sct_range, pattern, correct):
+    user_data = trans(deepcopy(user_data_seed))
+    sct = [{"range": sct_range, "sct": [f'Ex().has_code("{pattern}", fixed=True)']}]
+
+    # Does not depend on solution_data
+    assert try_exercise(user_data, user_data, sct)["success"] == correct

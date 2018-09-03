@@ -1,16 +1,22 @@
-from .utils import crop_by_range, is_empty, round_array_2d, normalize_array_2d
+from .utils import crop_by_range, is_empty, round_array_2d, normalize_array_2d, map_2d
 import copy
 import re
 
 
-def has_code(
-    state,
-    text,
-    incorrect_msg="The checker expected to find `{{text}}` in your command.",
-    fixed=False,
-):
-    """TODO
-    """
+def has_code(state, pattern, fixed=False, incorrect_msg=None):
+    child = check_range(state, field="formulas", field_msg="formula")
+
+    def match(on_text):
+        if fixed:
+            return on_text == pattern
+        else:
+            return re.search(pattern, on_text) is not None
+
+    student_matches = map_2d(match, child.student_data["formulas"])
+
+    if not all([all(row) for row in student_matches]):
+        _msg = incorrect_msg or f"The formula at `{state.sct_range}` is not correct."
+        state.do_test(_msg)
 
     return state
 
