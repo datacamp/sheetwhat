@@ -34,9 +34,9 @@ def solution_data_normalize():
         (Mutation(["values", 1, 0], "test"), "A1:B2", True),
     ],
 )
-def test_check_formula(solution_data, trans, sct_range, correct):
+def test_has_equal_formula(solution_data, trans, sct_range, correct):
     user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": ["check_formula"]}]
+    sct = [{"range": sct_range, "sct": ["Ex().has_equal_formula()"]}]
 
     assert try_exercise(solution_data, user_data, sct)["success"] == correct
 
@@ -52,10 +52,10 @@ def test_check_formula(solution_data, trans, sct_range, correct):
         (Mutation(["formulas", 0, 1], "=aVaRaGe(A1)"), "A2", True),
     ],
 )
-def test_check_formula_normalization(
+def test_has_equal_formula_normalization(
     solution_data_normalize, trans, sct_range, correct
 ):
     user_data = trans(deepcopy(solution_data_normalize))
-    sct = [{"range": sct_range, "sct": ["check_formula"]}]
+    sct = [{"range": sct_range, "sct": ["Ex().has_equal_formula()"]}]
 
     assert try_exercise(solution_data_normalize, user_data, sct)["success"] == correct

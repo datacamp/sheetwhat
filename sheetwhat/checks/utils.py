@@ -53,3 +53,29 @@ def crop_by_range(array_2d, range_spec):
             for array in array_2d[row_columns["start_row"] : row_columns["end_row"]]
         ]
     )
+
+
+def is_empty(x):
+    if isinstance(x, list):
+        return all([is_empty(el) for el in x])
+    elif isinstance(x, (str, dict)):
+        return len(x) == 0
+    else:
+        return x is None
+
+
+def round_array_2d(array_2d, ndigits):
+    return [
+        [round(x, ndigits) if isinstance(x, (int, float)) else x for x in row]
+        for row in array_2d
+    ]
+
+
+def normalize_array_2d(array_2d):
+    normalize = (
+        lambda formula: re.sub(r"\s+", "", formula.lower())
+        if isinstance(formula, str)
+        else formula
+    )
+
+    return [[normalize(cell) for cell in row] for row in array_2d]
