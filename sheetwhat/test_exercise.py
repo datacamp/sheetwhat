@@ -5,38 +5,23 @@ from sheetwhat.sct_syntax import SCT_CTX
 from sheetwhat.State import State
 
 
-def test_exercise(
-    sct,
-    student_code,
-    student_result,
-    student_conn,
-    solution_code,
-    solution_result,
-    solution_conn,
-    pre_exercise_code,
-    ex_type,
-    error,
-    debug=False,  # currently unused
-):
+def test_exercise(sct, student_data, solution_data):
     """
     """
 
-    state = State(
-        student_code=student_code,
-        solution_code=solution_code,
-        pre_exercise_code=pre_exercise_code,
-        student_conn=student_conn,
-        solution_conn=solution_conn,
-        student_result=student_result,
-        solution_result=solution_result,
-        reporter=Reporter(error),
-    )
+    for single_sct in sct:
+        state = State(
+            student_data=student_data,
+            solution_data=solution_data,
+            sct_range=single_sct.get("range"),
+            reporter=Reporter(),
+        )
 
-    SCT_CTX["Ex"].root_state = state
+        SCT_CTX["Ex"].root_state = state
 
-    try:
-        exec(sct, SCT_CTX)
-    except TestFail as tf:
-        return tf.payload
+        try:
+            exec("\n".join(single_sct.get("sct", [])), SCT_CTX)
+        except TestFail as tf:
+            return tf.payload
 
     return state.reporter.build_final_payload()

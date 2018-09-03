@@ -76,11 +76,11 @@ class Deletion:
 
 
 def try_exercise(solution_data, user_data, sct):
-    res = requests.post(
-        ENDPOINT,
-        json={"solution_data": solution_data, "user_data": user_data, "sct": sct},
-    )
-    return res.json()
+    from sheetwhat.test_exercise import test_exercise
+
+    result = test_exercise(sct, user_data, solution_data)
+
+    return {"success": result.get("correct", False), "message": result.get("message")}
 
 
 def compose(*functions):
