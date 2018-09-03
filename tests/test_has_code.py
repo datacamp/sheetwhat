@@ -1,7 +1,8 @@
 import pytest
 from copy import deepcopy
-from utils import Identity, Mutation, try_exercise, compose
-
+from utils import Identity, Mutation, compose, setup_state, verify_success
+from protowhat.Test import TestFail as TF
+from sheetwhat.checks import has_code
 
 # Fixtures
 @pytest.fixture()
@@ -10,7 +11,6 @@ def user_data_seed():
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
     }
-
 
 # Tests
 @pytest.mark.parametrize(
@@ -42,23 +42,22 @@ def user_data_seed():
 )
 def test_check_regex(user_data_seed, trans, sct_range, pattern, correct):
     user_data = trans(deepcopy(user_data_seed))
-    sct = [{"range": sct_range, "sct": [f'Ex().has_code("{pattern}")']}]
+    s = setup_state(user_data, user_data, sct_range)
+    with verify_success(correct):
+        has_code(s, pattern)
 
-    # Does not depend on solution_data
-    assert try_exercise(user_data, user_data, sct)["success"] == correct
 
-
+@pytest.mark.debug
 @pytest.mark.parametrize(
     "trans, sct_range, pattern, correct",
     [
         (Mutation(["formulas", 0, 0], "dees+"), "A1", "dees+", True),
         (Mutation(["formulas", 0, 0], "deesssss"), "A1", "dees+", False),
-        (Mutation(["formulas", 0, 0], "dees"), "A1", "dees+", False),
+        (Mutation(["formulas", 0, 0], "dees"), "A1", "dees+", False)
     ],
 )
 def test_check_regex_fixed(user_data_seed, trans, sct_range, pattern, correct):
     user_data = trans(deepcopy(user_data_seed))
-    sct = [{"range": sct_range, "sct": [f'Ex().has_code("{pattern}", fixed=True)']}]
-
-    # Does not depend on solution_data
-    assert try_exercise(user_data, user_data, sct)["success"] == correct
+    s = setup_state(user_data, user_data, sct_range)
+    with verify_success(correct):
+        has_code(s, pattern, fixed=True)

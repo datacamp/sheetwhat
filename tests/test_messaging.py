@@ -1,38 +1,57 @@
 import importlib
 import pytest
-
-from copy import deepcopy
-from utils import Identity, Mutation, try_exercise
-
-
-@pytest.fixture()
-def solution_data():
-    return {
-        "values": [[1, 1, 1], [1, 52, 8]],
-        "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
-    }
+from utils import setup_state
+from protowhat.Test import TestFail as TF
+from sheetwhat.checks import *
 
 
 @pytest.mark.parametrize(
-    "trans, sct_range, target",
+    "field, field_msg, patt",
     [
-        (
-            Mutation(["values", 0, 0], 5),
-            "A1",
-            "The value at <code>A1</code> is not correct.",
-        ),
-        (
-            Mutation(["values", 0, 0], 5),
-            "A1:B2",
-            "The value at <code>A1:B2</code> is not correct.",
-        ),
+        ("values", "value", "Please fill in a value in `B1`."),
+        ("formulas", "formula", "Please fill in a formula in `B1`."),
     ],
 )
-def test_check_value(solution_data, trans, sct_range, target):
-    user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": ["Ex().has_equal_value()"]}]
-    assert try_exercise(solution_data, user_data, sct)["message"] == target
+def test_check_range(field, field_msg, patt):
+    s = setup_state(
+        {"values": [[1]], "formulas": [["=1"]]},
+        {"values": [[1, 2]], "formulas": [["=1"]]},
+        "B1",
+    )
+    with pytest.raises(TF, match=patt):
+        check_range(s, field, field_msg)
 
 
-# TODO: test_messaging for check_range
-# TODO: test_messaging for has_equal_formula
+def test_has_code():
+    user_data = {"formulas": [["missing"]]}
+    s = setup_state(user_data, user_data, "A1")
+    with pytest.raises(TF, match=r"In cell `A1`, did you use the correct formula\?"):
+        has_code(s, "something")
+
+
+def test_check_function():
+    user_data = {"formulas": [["SUM(B1)"]]}
+    s = setup_state(user_data, user_data, "A1")
+    with pytest.raises(
+        TF, match=r"In cell `A1`, did you use the `AVERAGE\(\)` function\?"
+    ):
+        check_function(s, name="AVERAGE")
+
+
+def test_check_operator():
+    user_data = {"formulas": [["=1 + 2"]]}
+    s = setup_state(user_data, user_data, "A1")
+    with pytest.raises(TF, match=r"In cell `A1`, did you use the `/` operator\?"):
+        check_operator(s, operator="/")
+
+
+def test_has_equal_value():
+    s = setup_state({"values": [[1]]}, {"values": [[2]]}, "A1")
+    with pytest.raises(TF, match=r"The value at `A1` is not correct."):
+        has_equal_value(s)
+
+
+def test_has_equal_formula():
+    s = setup_state({"formulas": [["=1"]]}, {"formulas": [["=2"]]}, "A1")
+    with pytest.raises(TF, match=r"In cell `A1`, did you use the correct formula\?"):
+        has_equal_formula(s)

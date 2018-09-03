@@ -1,11 +1,13 @@
 import pytest
 from copy import deepcopy
-from utils import Identity, Mutation, try_exercise
+from utils import Identity, Mutation, setup_state, verify_success
+from sheetwhat.checks import has_equal_formula
+from protowhat.Test import TestFail as TF
 
 
 # Fixtures
 @pytest.fixture()
-def solution_data():
+def user_data_seed():
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
@@ -13,7 +15,7 @@ def solution_data():
 
 
 @pytest.fixture()
-def solution_data_normalize():
+def user_data_norm_seed():
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=SUM(A1:C1)", 1, 1], ["=   AVaragE(A1)", "=52", 8]],
@@ -34,12 +36,11 @@ def solution_data_normalize():
         (Mutation(["values", 1, 0], "test"), "A1:B2", True),
     ],
 )
-def test_has_equal_formula(solution_data, trans, sct_range, correct):
-    user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": ["Ex().has_equal_formula()"]}]
-
-    assert try_exercise(solution_data, user_data, sct)["success"] == correct
-
+def test_has_equal_formula(user_data_seed, trans, sct_range, correct):
+    user_data = trans(deepcopy(user_data_seed))
+    s = setup_state(user_data, user_data_seed, sct_range)
+    with verify_success(correct):
+        has_equal_formula(s)
 
 @pytest.mark.parametrize(
     "trans, sct_range, correct",
@@ -53,9 +54,9 @@ def test_has_equal_formula(solution_data, trans, sct_range, correct):
     ],
 )
 def test_has_equal_formula_normalization(
-    solution_data_normalize, trans, sct_range, correct
+    user_data_norm_seed, trans, sct_range, correct
 ):
-    user_data = trans(deepcopy(solution_data_normalize))
-    sct = [{"range": sct_range, "sct": ["Ex().has_equal_formula()"]}]
-
-    assert try_exercise(solution_data_normalize, user_data, sct)["success"] == correct
+    user_data = trans(deepcopy(user_data_norm_seed))
+    s = setup_state(user_data, user_data_norm_seed, sct_range)
+    with verify_success(correct):
+        has_equal_formula(s)
