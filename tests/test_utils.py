@@ -58,6 +58,7 @@ def test_range_to_row_columns(range_spec, start_row, start_column, end_row, end_
         ([[0, 1, 2], [3, 4, 5]], "A1:B1", [[0, 1]]),
         ([[0, 1, 2], [3, 4, 5]], "A1:B2", [[0, 1], [3, 4]]),
         ([[0, 1, 2], [3, 4, 5]], "Z1", [[]]),
+        ([[0, 1, 2], [3, 4, 5]], "B3", [[]]),
     ],
 )
 def test_crop_by_range(array_2d, range_spec, target):

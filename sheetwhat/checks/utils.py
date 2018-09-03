@@ -46,11 +46,15 @@ def letters_to_numbers(letters):
 
 def crop_by_range(array_2d, range_spec):
     row_columns = range_to_row_columns(range_spec)
+    row_range = array_2d[row_columns["start_row"] : row_columns["end_row"]]
+
+    if len(row_range) == 0:
+        return [[]]
 
     return copy.deepcopy(
         [
             array[row_columns["start_column"] : row_columns["end_column"]]
-            for array in array_2d[row_columns["start_row"] : row_columns["end_row"]]
+            for array in row_range
         ]
     )
 
@@ -69,13 +73,12 @@ def round_array_2d(array_2d, ndigits):
     return map_2d(round_value, array_2d)
 
 
+def normalize_formula(formula):
+    return re.sub(r"\s+", "", formula.lower()) if isinstance(formula, str) else formula
+
+
 def normalize_array_2d(array_2d):
-    normalize = (
-        lambda formula: re.sub(r"\s+", "", formula.lower())
-        if isinstance(formula, str)
-        else formula
-    )
-    return map_2d(normalize, array_2d)
+    return map_2d(normalize_formula, array_2d)
 
 
 def map_2d(func, array_2d):

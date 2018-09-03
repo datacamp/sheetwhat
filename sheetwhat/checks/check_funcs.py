@@ -1,24 +1,44 @@
-from .utils import crop_by_range, is_empty, round_array_2d, normalize_array_2d, map_2d
+from .utils import (
+    crop_by_range,
+    is_empty,
+    round_array_2d,
+    normalize_array_2d,
+    map_2d,
+    normalize_formula,
+)
 import copy
 import re
 
 
-def has_code(state, pattern, fixed=False, incorrect_msg=None):
+def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x: x):
     child = check_range(state, field="formulas", field_msg="formula")
 
     def match(on_text):
         if fixed:
-            return on_text == pattern
+            return normalize(pattern) in str(on_text)
         else:
-            return re.search(pattern, on_text) is not None
+            return re.search(pattern, str(on_text)) is not None
 
-    student_matches = map_2d(match, child.student_data["formulas"])
+    student_formulas_normalized = map_2d(normalize, child.student_data["formulas"])
+    student_matches = map_2d(match, student_formulas_normalized)
 
-    if not all([all(row) for row in student_matches]):
-        _msg = incorrect_msg or f"The formula at `{state.sct_range}` is not correct."
-        state.do_test(_msg)
+    if sum([sum(row) for row in student_matches]) == 0:
+        _msg = incorrect_msg or f"The formula at `{child.sct_range}` is not correct."
+        child.do_test(_msg)
 
     return state
+
+
+def check_function(state, name, missing_msg=None):
+    has_code(state, pattern=name, fixed=True, normalize=normalize_formula)
+    # Don't return state; chaining not implemented yet
+    return None
+
+
+def check_operator(state, operator, missing_msg=None):
+    has_code(state, pattern=operator, fixed=True, normalize=normalize_formula)
+    # Don't return state; chaining not implemented yet
+    return None
 
 
 def check_range(state, field, field_msg, missing_msg=None):
@@ -46,8 +66,8 @@ def has_equal_value(state, incorrect_msg=None, ndigits=4):
     solution_values_rounded = round_array_2d(child.solution_data["values"], ndigits)
 
     if student_values_rounded != solution_values_rounded:
-        _msg = incorrect_msg or f"The value at `{state.sct_range}` is not correct."
-        state.do_test(_msg)
+        _msg = incorrect_msg or f"The value at `{child.sct_range}` is not correct."
+        child.do_test(_msg)
 
     return state
 
@@ -59,7 +79,7 @@ def has_equal_formula(state, incorrect_msg=None, ndigits=4):
     solution_formulas_normalized = normalize_array_2d(child.solution_data["formulas"])
 
     if student_formulas_normalized != solution_formulas_normalized:
-        _msg = incorrect_msg or f"The formula at `{state.sct_range}` is not correct."
-        state.do_test(_msg)
+        _msg = incorrect_msg or f"The formula at `{child.sct_range}` is not correct."
+        child.do_test(_msg)
 
     return state

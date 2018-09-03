@@ -3,6 +3,8 @@ from sheetwhat.checks.check_funcs import (
     check_range,
     has_equal_value,
     has_equal_formula,
+    check_function,
+    check_operator,
 )
 
 # don't import some funcs from protowhat that don't make sense:
