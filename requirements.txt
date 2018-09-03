@@ -1,0 +1,11 @@
+# pkg deps
+protowhat==1.1.1
+
+# test deps
+pytest==3.7.2
+codecov==2.0.15
+pytest-cov==2.5.1
+
+# doc deps
+sphinx==1.7.7
+sphinx_rtd_theme==v0.4.1
