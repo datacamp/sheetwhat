@@ -1,4 +1,5 @@
 import pytest
 
-def test_irrelevant():
-    pass
+
+def test_import():
+    import sheetwhat
