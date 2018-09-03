@@ -1,25 +1,13 @@
 sudo: false
 language: python
 
-services:
-  - docker
-
 python:
-  - '3.5'
+  - "3.5"
 
-install:
-  - make build
+before_install:
+  - pip install -r requirements.txt
+  - pip install -e .
 
-script:
-  - make test
+script: pytest --cov=sheetwhat
 
-# deploy:
-#   provider: pypi
-#   user: machow
-#   password:
-#     secure: QTs8hWRaeCo6ZimW6tAPHqH4KVli+5DgXnLQkifv61hMC0rKtag0X6AiHHcXsLJk4TW61TLP5Hzuewzhzkx3VGQdJPSawlWxfJEGciUbcPxG33xSskytZxgp/k6bqE7e+XNR0zskCJRBdTedBiu+mY2jO0gTPm/f6AweZ9wURbR+rb1w4cyiUa2NzzJeehYl1BhJ609Fd1ailmWApyXlh9tzOcbimwChWtD48oZ2RVssiyrAyXsygTak+CmzabFmbufnb+apPek76ikwiGwESOajaWyRL25RCMj+H+64oeMOcyhtVSMnWlzhCyLLuvdwQwbMktUmoEAefTqWKa179hDindYGsOFfBrjXSiHE3s9uozBSmwDXKAcJ62dYP4xN6YT0usC+ZpAe8Jiw2ZlkUi55JYcQcwnurwjBJJgMxXVMgI4c3Eei6tsJhKIRTZ1ZOT+sTXtMF75QvZ+X6+HXrG7SaXn5oAVP2kuNCycpgKDzSZPuHARvWulARsfspJRK0e9urN5G6E/efvLWWpNJ1aYi+K4f70NdiAkgTIzYdQSV2c7FG+pHYSByUK+ArafMwGmCI658YQPgDRMjTrh4h/rxkMPX2196sBNmdea+TaxpNPMHjc3ummgayWz2KIkbqqUb1CYSS/naZJICd/FD2e8nkmAoSU8p2+suNJgqI3c=
-#   on:
-#     tags: true
-#     distributions: sdist bdist_wheel
-#     repo: datacamp/sheetwhat
-#     skip_upload_docs: true
+after_success: codecov

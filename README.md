@@ -18,3 +18,11 @@ Installing
 pip install sheetwhat
 ```
 
+Testing
+-------
+
+```
+pip install -r requirements.txt
+pip install -e .
+pytest
+```
