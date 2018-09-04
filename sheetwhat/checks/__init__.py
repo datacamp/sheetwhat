@@ -4,10 +4,10 @@ from sheetwhat.checks.check_funcs import (
     has_equal_value,
     has_equal_formula,
     has_equal_references,
-    has_equal_pivot,
     check_function,
     check_operator,
 )
+from sheetwhat.checks.check_pivot import has_equal_pivot
 
 # don't import some funcs from protowhat that don't make sense:
 # - check_node, check_edge and has_equal_ast don't work well.
