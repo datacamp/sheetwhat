@@ -1,9 +1,7 @@
 import pytest
 from copy import deepcopy
-from utils import Identity, Mutation, setup_state, verify_success
+from helper import Identity, Mutation, setup_state, verify_success
 from sheetwhat.checks import has_equal_formula
-from protowhat.Test import TestFail as TF
-
 
 # Fixtures
 @pytest.fixture()
@@ -41,6 +39,7 @@ def test_has_equal_formula(user_data_seed, trans, sct_range, correct):
     s = setup_state(user_data, user_data_seed, sct_range)
     with verify_success(correct):
         has_equal_formula(s)
+
 
 @pytest.mark.parametrize(
     "trans, sct_range, correct",

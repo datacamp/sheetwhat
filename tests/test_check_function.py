@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from utils import verify_success, setup_state
+from helper import verify_success, setup_state
 from sheetwhat.checks import check_function
 
 # Fixtures
@@ -22,6 +22,7 @@ def user_data_normalize():
         ],
     }
 
+
 # Tests
 @pytest.mark.parametrize(
     "sct_range, function, correct",
@@ -41,6 +42,7 @@ def test_check_function(user_data, sct_range, function, correct):
     s = setup_state(user_data, user_data, sct_range)
     with verify_success(correct):
         check_function(s, name=function)
+
 
 @pytest.mark.parametrize(
     "sct_range, function, correct",

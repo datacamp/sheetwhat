@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from utils import setup_state, verify_success
+from helper import setup_state, verify_success
 from sheetwhat.checks import check_operator
 
 # Fixtures
@@ -38,6 +38,7 @@ def test_check_operator(user_data, sct_range, operator, correct):
     s = setup_state(user_data, user_data, sct_range)
     with verify_success(correct):
         check_operator(s, operator=operator)
+
 
 @pytest.mark.parametrize(
     "sct_range, operator, correct",

@@ -16,14 +16,17 @@ def deep_coalesce(path, default):
         path = type(path)(deep_coalesce(p, default) for p in path)
     return glom.Coalesce(path, default=default)
 
+
 def safe_glom(obj, path, fallback=None):
     return glom.glom(obj, deep_coalesce(path, fallback))
+
 
 class Rule:
     def __init__(self, student_pivot_table, solution_pivot_table, issues):
         self.student_pivot_table = student_pivot_table
         self.solution_pivot_table = solution_pivot_table
         self.issues = issues
+
 
 class ArrayEqualityRule(Rule):
     def __call__(self, path, message):
@@ -51,6 +54,7 @@ class ArrayEqualityRule(Rule):
                 ]
             )
 
+
 class ArrayEqualLengthRule(Rule):
     def __call__(self, path, message):
         solution_array = safe_glom(self.solution_pivot_table, path)
@@ -63,11 +67,9 @@ class ArrayEqualLengthRule(Rule):
         student_array_len = len(student_array)
         if solution_array_len != student_array_len:
             self.issues.append(
-                message.format(
-                    expected = solution_array_len,
-                    actual=student_array_len,
-                )
+                message.format(expected=solution_array_len, actual=student_array_len)
             )
+
 
 class EqualityRule(Rule):
     def __call__(self, path, message):
@@ -196,21 +198,21 @@ def has_equal_pivot(state, extra_msg=None):
                 (
                     "The number of values is incorrect. "
                     "Expected {expected}, but got {actual}."
-                )
+                ),
             )
             bound_rules["array_equal_length"](
                 "rows",
                 (
                     "The number of rows is incorrect. "
                     "Expected {expected}, but got {actual}."
-                )
+                ),
             )
             bound_rules["array_equal_length"](
                 "columns",
                 (
                     "The number of columns is incorrect. "
                     "Expected {expected}, but got {actual}."
-                )
+                ),
             )
 
             nb_issues = len(issues)

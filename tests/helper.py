@@ -11,25 +11,22 @@ from functools import reduce
 from copy import deepcopy
 from contextlib import contextmanager
 
+
 def setup_state(stu, sol, sct_range):
     return State(stu, sol, sct_range, reporter=Reporter())
 
+
 @contextmanager
-def verify_success(should_pass):
+def verify_success(should_pass, match=None):
     if should_pass:
         yield
     else:
-        with pytest.raises(TF):
-            yield
-
-
-
-def try_exercise(solution_data, user_data, sct):
-    from sheetwhat.test_exercise import test_exercise
-
-    result = test_exercise(sct, user_data, solution_data)
-
-    return {"success": result.get("correct", False), "message": result.get("message")}
+        if match is not None:
+            with pytest.raises(TF, match=match):
+                yield
+        else:
+            with pytest.raises(TF):
+                yield
 
 
 class Identity:
