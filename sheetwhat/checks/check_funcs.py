@@ -128,10 +128,8 @@ def has_equal_references(state, absolute=False, incorrect_msg=None):
             for reference in solution_references:
                 if normalize_formula(reference) not in normalize_formula(student_cell):
                     _msg = (
-                        f"In cell {child.sct_range}, did you use the "
+                        f"In cell `{child.sct_range}`, did you use the "
                         f"{('absolute ' if absolute else '')}"
-                        f"reference `{reference}`"
+                        f"reference `{reference}`?"
                     )
                     child.do_test(_msg)
-
-

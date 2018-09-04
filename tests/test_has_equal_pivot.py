@@ -1,6 +1,15 @@
 import pytest
 from copy import deepcopy
-from utils import Identity, Mutation, try_exercise, compose, Deletion, Addition
+from helper import (
+    Identity,
+    Mutation,
+    setup_state,
+    verify_success,
+    compose,
+    Deletion,
+    Addition,
+)
+from sheetwhat.checks import has_equal_pivot
 
 # Fixtures
 @pytest.fixture()
@@ -114,61 +123,61 @@ def solution_data_two_values(pivot_tables_two_values):
             Mutation(["pivotTables", 0, 0, "source", "startRowIndex"], 1),
             "A1",
             False,
-            ["1 issue", "source data"],
+            r"1 issue(.|\s)*source data",
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "endRowIndex"], 1),
             "A1",
             False,
-            ["1 issue", "source data"],
+            r"1 issue(.|\s)*source data",
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "startColumnIndex"], 1),
             "A1",
             False,
-            ["1 issue", "source data"],
+            r"1 issue(.|\s)*source data",
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "endColumnIndex"], 1),
             "A1",
             False,
-            ["1 issue", "source data"],
+            r"1 issue(.|\s)*source data",
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "startRowIndex"], 1),
             "B1",
             False,
-            ["fill in", "pivot table", "B1"],
+            r"fill in(.|\s)*pivot table(.|\s)*`B1`",
         ),
         (
             Mutation(["pivotTables", 0, 0, "rows", 0, "sortOrder"], "DESCENDING"),
             "A1",
             False,
-            ["1 issue", "sort order"],
+            r"1 issue(.|\s)*sort order",
         ),
         (
             Deletion(["pivotTables", 0, 0, "rows"]),
             "A1",
             False,
-            ["1 issue", "There are no rows"],
+            r"1 issue(.|\s)*There are no rows",
         ),
         (
             Deletion(["pivotTables", 0, 0, "columns"]),
             "A1",
             False,
-            ["1 issue", "There are no columns"],
+            r"1 issue(.|\s)*There are no columns",
         ),
         (
             Deletion(["pivotTables", 0, 0, "values"]),
             "A1",
             False,
-            ["1 issue", "There are no values"],
+            r"1 issue(.|\s)*There are no values",
         ),
         (
             Deletion(["pivotTables", 0, 0, "criteria"]),
             "A1",
             False,
-            ["1 issue", "There are no filters"],
+            r"1 issue(.|\s)*There are no filters",
         ),
         (
             Mutation(
@@ -177,13 +186,13 @@ def solution_data_two_values(pivot_tables_two_values):
             ),
             "A1",
             False,
-            ["1 issue", "sort group"],
+            r"1 issue(.|\s)*sort group",
         ),
         (
             Mutation(["pivotTables", 0, 0, "columns", 0, "sourceColumnOffset"], 1),
             "A1",
             False,
-            ["1 issue", "column", "grouping variable", "incorrect"],
+            r"1 issue(.|\s)*column(.|\s)*grouping variable(.|\s)*incorrect",
         ),
         (
             Mutation(
@@ -191,17 +200,13 @@ def solution_data_two_values(pivot_tables_two_values):
             ),
             "A1",
             False,
-            [
-                "1 issue",
-                "expected the first",
-                "<code>SUM</code>, but got <code>AVERAGE</code>",
-            ],
+            r"1 issue(.|\s)*expected the first(.|\s)*`SUM`, but got `AVERAGE`",
         ),
         (
             Deletion(["pivotTables", 0, 0, "columns", 0, "showTotals"]),
             "A1",
             False,
-            ["1 issue", "totals", "first", "not showing"],
+            r"1 issue(.|\s)*first(.|\s)*total(.|\s)*not showing",
         ),
         (
             Deletion(["pivotTables", 0, 0, "values", 0, "calculatedDisplayType"]),
@@ -217,23 +222,15 @@ def solution_data_two_values(pivot_tables_two_values):
             ),
             "A1",
             False,
-            ["1 issue", "The number of rows is incorrect"],
+            r"1 issue(.|\s)*The number of rows is incorrect",
         ),
     ],
 )
 def test_check_pivots(solution_data, trans, sct_range, correct, message_contains):
     user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": ["Ex().has_equal_pivot()"]}]
-    result = try_exercise(solution_data, user_data, sct)
-
-    assert result.get("success") == correct
-    if message_contains is not None:
-        assert result.get("message") is not None
-        message = result.get("message")
-        if isinstance(message_contains, list):
-            assert all([x in message for x in message_contains])
-        else:
-            assert message_contains in message
+    s = setup_state(user_data, solution_data, sct_range)
+    with verify_success(correct, message_contains):
+        has_equal_pivot(s)
 
 
 @pytest.mark.parametrize(
@@ -244,7 +241,7 @@ def test_check_pivots(solution_data, trans, sct_range, correct, message_contains
             Deletion(["pivotTables", 0, 0, "values", 1]),
             "A1",
             False,
-            ["1 issue", "The number of values is incorrect"],
+            r"1 issue(.|\s)*The number of values is incorrect",
         ),
         (
             Addition(
@@ -253,7 +250,7 @@ def test_check_pivots(solution_data, trans, sct_range, correct, message_contains
             ),
             "A1",
             False,
-            ["1 issue", "There are rows but there shouldn't be"],
+            r"1 issue(.|\s)*There are rows but there shouldn't be",
         ),
         (
             Mutation(
@@ -262,7 +259,7 @@ def test_check_pivots(solution_data, trans, sct_range, correct, message_contains
             ),
             "A1",
             False,
-            ["1 issue", "There are columns", "shouldn't be"],
+            r"1 issue(.|\s)*There are columns(.|\s)*shouldn't be",
         ),
     ],
 )
@@ -270,14 +267,6 @@ def test_check_pivots_two_values(
     solution_data_two_values, trans, sct_range, correct, message_contains
 ):
     user_data = trans(deepcopy(solution_data_two_values))
-    sct = [{"range": sct_range, "sct": ["Ex().has_equal_pivot()"]}]
-    result = try_exercise(solution_data_two_values, user_data, sct)
-
-    assert result.get("success") == correct
-    if message_contains is not None:
-        assert result.get("message") is not None
-        message = result.get("message")
-        if isinstance(message_contains, list):
-            assert all([x in message for x in message_contains])
-        else:
-            assert message_contains in message
+    s = setup_state(user_data, solution_data_two_values, sct_range)
+    with verify_success(correct, message_contains):
+        has_equal_pivot(s)

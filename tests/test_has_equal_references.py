@@ -1,6 +1,7 @@
 import pytest
 from copy import deepcopy
-from utils import Identity, Mutation, try_exercise, compose
+from helper import Identity, Mutation, setup_state, verify_success, compose
+from sheetwhat.checks import has_equal_references
 
 # Fixtures
 @pytest.fixture()
@@ -21,79 +22,40 @@ def solution_data_normalize():
 
 # Tests
 @pytest.mark.parametrize(
-    "trans, sct_range, correct, message_contains",
+    "trans, sct_range, correct",
     [
-        (Identity(), "A1", True, None),
-        (
-            Mutation(["formulas", 0, 0], "=  C1"),
-            "A1",
-            False,
-            "reference <code>B1</code>",
-        ),
-        (Mutation(["formulas", 0, 0], "=  C1"), "B1", True, None),
-        (Mutation(["formulas", 0, 1], "=  C1"), "A1", True, None),
-        (Mutation(["formulas", 1, 0], "=  C1"), "A2", True, None),
-        (Mutation(["formulas", 0, 0], "=  C1"), "B2", True, None),
-        (Mutation(["formulas", 0, 0], "=  b1"), "A1", True, None),
-        (Identity(), "B2", True, None),
-        (
-            Mutation(["formulas", 1, 1], "=    A1:A2"),
-            "B2",
-            False,
-            "the reference <code>B2:C5</code>",
-        ),
+        (Mutation(["formulas", 0, 0], "=  C1"), "A1", False),
+        (Mutation(["formulas", 0, 0], "=  C1"), "B1", True),
+        (Mutation(["formulas", 0, 1], "=  C1"), "A1", True),
+        (Mutation(["formulas", 1, 0], "=  C1"), "A2", True),
+        (Mutation(["formulas", 0, 0], "=  C1"), "B2", True),
+        (Mutation(["formulas", 0, 0], "=  b1"), "A1", True),
+        (Identity(), "B2", True),
+        (Mutation(["formulas", 1, 1], "=    A1:A2"), "B2", False),
     ],
 )
-def test_check_reference(solution_data, trans, sct_range, correct, message_contains):
+def test_check_reference(solution_data, trans, sct_range, correct):
     user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": ["Ex().has_equal_references()"]}]
-    result = try_exercise(solution_data, user_data, sct)
-
-    assert result.get("success") == correct
-    if message_contains is not None:
-        assert result.get("message") is not None
-        message = result.get("message")
-        if isinstance(message_contains, list):
-            assert all([x in message for x in message_contains])
-        else:
-            assert message_contains in message
+    s = setup_state(user_data, solution_data, sct_range)
+    with verify_success(correct):
+        has_equal_references(s)
 
 
 @pytest.mark.parametrize(
-    "trans, sct_range, correct, message_contains",
+    "trans, sct_range, correct",
     [
-        (Identity(), "A1", True, None),
-        (
-            Mutation(["formulas", 0, 0], "=  C1"),
-            "A1",
-            False,
-            "reference <code>B1</code>",
-        ),
-        (Mutation(["formulas", 0, 0], "=  C1"), "B1", True, None),
-        (Mutation(["formulas", 0, 1], "=  C1"), "A1", True, None),
-        (Mutation(["formulas", 1, 0], "=  C1"), "A2", True, None),
-        (Mutation(["formulas", 0, 0], "=  C1"), "B2", True, None),
-        (Identity(), "B2", True, None),
-        (
-            Mutation(["formulas", 1, 1], "=    A1:A2"),
-            "B2",
-            False,
-            "reference <code>B2:C5</code>",
-        ),
+        (Identity(), "A1", True),
+        (Mutation(["formulas", 0, 0], "=  C1"), "A1", False),
+        (Mutation(["formulas", 0, 0], "=  C1"), "B1", True),
+        (Mutation(["formulas", 0, 1], "=  C1"), "A1", True),
+        (Mutation(["formulas", 1, 0], "=  C1"), "A2", True),
+        (Mutation(["formulas", 0, 0], "=  C1"), "B2", True),
+        (Identity(), "B2", True),
+        (Mutation(["formulas", 1, 1], "=    A1:A2"), "B2", False),
     ],
 )
-def test_check_reference_normalize(
-    solution_data_normalize, trans, sct_range, correct, message_contains
-):
+def test_check_reference_normalize(solution_data_normalize, trans, sct_range, correct):
     user_data = trans(deepcopy(solution_data_normalize))
-    sct = [{"range": sct_range, "sct": ["Ex().has_equal_references()"]}]
-    result = try_exercise(solution_data_normalize, user_data, sct)
-
-    assert result.get("success") == correct
-    if message_contains is not None:
-        assert result.get("message") is not None
-        message = result.get("message")
-        if isinstance(message_contains, list):
-            assert all([x in message for x in message_contains])
-        else:
-            assert message_contains in message
+    s = setup_state(user_data, solution_data_normalize, sct_range)
+    with verify_success(correct):
+        has_equal_references(s)

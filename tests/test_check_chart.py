@@ -1,6 +1,6 @@
 # import pytest
 # from copy import deepcopy
-# from utils import Identity, Mutation, try_exercise, compose, Deletion, Addition
+# from helper import Identity, Mutation, setup_state, verify_success, compose, Deletion, Addition
 #
 ## Fixtures
 # @pytest.fixture()
@@ -246,5 +246,6 @@
 # )
 # def test_check_charts(solution_data, trans, sct_range, correct):
 #    user_data = trans(deepcopy(solution_data))
-#    sct = [{"range": sct_range, "sct": ["check_chart"]}]
-#    assert try_exercise(solution_data, user_data, sct)["success"] == correct
+#    s = setup_state(user_data, solution_data)
+#    with verify_success(correct):
+#       has_equal_chart(s)

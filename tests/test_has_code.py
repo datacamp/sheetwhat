@@ -1,7 +1,6 @@
 import pytest
 from copy import deepcopy
-from utils import Identity, Mutation, compose, setup_state, verify_success
-from protowhat.Test import TestFail as TF
+from helper import Identity, Mutation, compose, setup_state, verify_success
 from sheetwhat.checks import has_code
 
 # Fixtures
@@ -11,6 +10,7 @@ def user_data_seed():
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
     }
+
 
 # Tests
 @pytest.mark.parametrize(
@@ -53,7 +53,7 @@ def test_check_regex(user_data_seed, trans, sct_range, pattern, correct):
     [
         (Mutation(["formulas", 0, 0], "dees+"), "A1", "dees+", True),
         (Mutation(["formulas", 0, 0], "deesssss"), "A1", "dees+", False),
-        (Mutation(["formulas", 0, 0], "dees"), "A1", "dees+", False)
+        (Mutation(["formulas", 0, 0], "dees"), "A1", "dees+", False),
     ],
 )
 def test_check_regex_fixed(user_data_seed, trans, sct_range, pattern, correct):

@@ -1,6 +1,6 @@
 import importlib
 import pytest
-from utils import setup_state
+from helper import setup_state
 from protowhat.Test import TestFail as TF
 from sheetwhat.checks import *
 
@@ -55,3 +55,17 @@ def test_has_equal_formula():
     s = setup_state({"formulas": [["=1"]]}, {"formulas": [["=2"]]}, "A1")
     with pytest.raises(TF, match=r"In cell `A1`, did you use the correct formula\?"):
         has_equal_formula(s)
+
+
+def test_has_equal_reference():
+    s = setup_state({"formulas": [["=A1"]]}, {"formulas": [["=B1"]]}, "A1")
+    with pytest.raises(TF, match=r"In cell `A1`, did you use the reference `B1`\?"):
+        has_equal_references(s)
+
+
+def test_has_equal_reference_bas():
+    s = setup_state({"formulas": [["=$A$1"]]}, {"formulas": [["=$B$1"]]}, "A1")
+    with pytest.raises(
+        TF, match=r"In cell `A1`, did you use the absolute reference `\$B\$1`\?"
+    ):
+        has_equal_references(s, absolute=True)
