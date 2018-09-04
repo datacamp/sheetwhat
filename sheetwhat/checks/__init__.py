@@ -3,6 +3,8 @@ from sheetwhat.checks.check_funcs import (
     check_range,
     has_equal_value,
     has_equal_formula,
+    has_equal_references,
+    has_equal_pivot,
     check_function,
     check_operator,
 )
