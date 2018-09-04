@@ -8,7 +8,7 @@ from utils import Identity, Mutation, try_exercise, compose
 def solution_data():
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
-        "formulas": [["=B1", 1, 1], ["=$C$2", "=B2:C5", 8]],
+        "formulas": [["=$B$1", 1, 1], ["=C2", "=$B$2:$C$5", 8]],
     }
 
 
@@ -16,7 +16,7 @@ def solution_data():
 def solution_data_normalize():
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
-        "formulas": [["=     B1", 1, 1], ["=$c$2", "=       B2:c5", 8]],
+        "formulas": [["=     $B$1", 1, 1], ["=c2", "=       $B$2:$c$5", 8]],
     }
 
 
@@ -25,23 +25,30 @@ def solution_data_normalize():
     "trans, sct_range, correct, message_contains",
     [
         (Identity(), "A1", True, None),
-        (Mutation(["formulas", 0, 0], "=  C1"), "A1", False, "reference to `B1`"),
+        (
+            Mutation(["formulas", 0, 0], "=  C1"),
+            "A1",
+            False,
+            "reference <code>$B$1</code>",
+        ),
         (Mutation(["formulas", 0, 0], "=  C1"), "B1", True, None),
         (Mutation(["formulas", 0, 1], "=  C1"), "A1", True, None),
-        (Mutation(["formulas", 1, 0], "=  C1"), "A2", True, None),
-        (Mutation(["formulas", 0, 0], "=  C1"), "B2", True, None),
+        (Mutation(["formulas", 1, 1], "=  C1"), "B2", False, None),
+        (Mutation(["formulas", 0, 1], "=  C1"), "A2", True, None),
         (Identity(), "B2", True, None),
         (
             Mutation(["formulas", 1, 1], "=    A1:A2"),
             "B2",
             False,
-            "reference to `B2:C5`",
+            "reference <code>$B$2:$C$5</code>",
         ),
     ],
 )
-def test_check_reference(solution_data, trans, sct_range, correct, message_contains):
+def test_check_absolute_references(
+    solution_data, trans, sct_range, correct, message_contains
+):
     user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": ["check_references"]}]
+    sct = [{"range": sct_range, "sct": ["Ex().has_equal_references(absolute=True)"]}]
     result = try_exercise(solution_data, user_data, sct)
 
     assert result.get("success") == correct
@@ -58,25 +65,30 @@ def test_check_reference(solution_data, trans, sct_range, correct, message_conta
     "trans, sct_range, correct, message_contains",
     [
         (Identity(), "A1", True, None),
-        (Mutation(["formulas", 0, 0], "=  C1"), "A1", False, "reference to `B1`"),
+        (
+            Mutation(["formulas", 0, 0], "=  C1"),
+            "A1",
+            False,
+            "reference <code>$B$1</code>",
+        ),
         (Mutation(["formulas", 0, 0], "=  C1"), "B1", True, None),
         (Mutation(["formulas", 0, 1], "=  C1"), "A1", True, None),
-        (Mutation(["formulas", 1, 0], "=  C1"), "A2", True, None),
-        (Mutation(["formulas", 0, 0], "=  C1"), "B2", True, None),
+        (Mutation(["formulas", 1, 1], "=  C1"), "B2", False, None),
+        (Mutation(["formulas", 0, 1], "=  C1"), "A2", True, None),
         (Identity(), "B2", True, None),
         (
             Mutation(["formulas", 1, 1], "=    A1:A2"),
             "B2",
             False,
-            "reference to `B2:C5`",
+            "reference <code>$B$2</code>",
         ),
     ],
 )
-def test_check_reference_normalize(
+def test_check_absolute_references_normalize(
     solution_data_normalize, trans, sct_range, correct, message_contains
 ):
     user_data = trans(deepcopy(solution_data_normalize))
-    sct = [{"range": sct_range, "sct": ["check_references"]}]
+    sct = [{"range": sct_range, "sct": ["Ex().has_equal_references(absolute=True)"]}]
     result = try_exercise(solution_data_normalize, user_data, sct)
 
     assert result.get("success") == correct

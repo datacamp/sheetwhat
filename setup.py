@@ -20,7 +20,7 @@ setup(
     name=PACKAGE_NAME,
     version=VERSION,
     packages=["sheetwhat", "sheetwhat.checks"],
-    install_requires=["protowhat>=1.1.2"],
+    install_requires=["protowhat>=1.1.2", "glom>=18.3.1"],
     description="Submission correctness tests for spreadsheets",
     long_description=README,
     long_description_content_type="text/markdown",

@@ -114,55 +114,61 @@ def solution_data_two_values(pivot_tables_two_values):
             Mutation(["pivotTables", 0, 0, "source", "startRowIndex"], 1),
             "A1",
             False,
-            ["`1` mistake", "source data"],
+            ["1 issue", "source data"],
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "endRowIndex"], 1),
             "A1",
             False,
-            ["`1` mistake", "source data"],
+            ["1 issue", "source data"],
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "startColumnIndex"], 1),
             "A1",
             False,
-            ["`1` mistake", "source data"],
+            ["1 issue", "source data"],
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "endColumnIndex"], 1),
             "A1",
             False,
-            ["`1` mistake", "source data"],
+            ["1 issue", "source data"],
         ),
         (
             Mutation(["pivotTables", 0, 0, "source", "startRowIndex"], 1),
             "B1",
-            True,
-            None,
+            False,
+            ["fill in", "pivot table", "B1"],
         ),
         (
             Mutation(["pivotTables", 0, 0, "rows", 0, "sortOrder"], "DESCENDING"),
             "A1",
             False,
-            ["`1` mistake", "sorting order"],
+            ["1 issue", "sort order"],
         ),
         (
             Deletion(["pivotTables", 0, 0, "rows"]),
             "A1",
             False,
-            ["`1` mistake", "define", "any rows"],
+            ["1 issue", "There are no rows"],
         ),
         (
             Deletion(["pivotTables", 0, 0, "columns"]),
             "A1",
             False,
-            ["`1` mistake", "define", "any columns"],
+            ["1 issue", "There are no columns"],
+        ),
+        (
+            Deletion(["pivotTables", 0, 0, "values"]),
+            "A1",
+            False,
+            ["1 issue", "There are no values"],
         ),
         (
             Deletion(["pivotTables", 0, 0, "criteria"]),
             "A1",
             False,
-            ["`1` mistake", "define", "any filter"],
+            ["1 issue", "There are no filters"],
         ),
         (
             Mutation(
@@ -171,13 +177,13 @@ def solution_data_two_values(pivot_tables_two_values):
             ),
             "A1",
             False,
-            ["`1` mistake", "sort", "correct value"],
+            ["1 issue", "sort group"],
         ),
         (
             Mutation(["pivotTables", 0, 0, "columns", 0, "sourceColumnOffset"], 1),
             "A1",
             False,
-            ["`1` mistake", "column", "use the correct field"],
+            ["1 issue", "column", "grouping variable", "incorrect"],
         ),
         (
             Mutation(
@@ -186,30 +192,23 @@ def solution_data_two_values(pivot_tables_two_values):
             "A1",
             False,
             [
-                "`1` mistake",
-                "summarize function",
-                "1st value",
-                "Expected `SUM`",
-                "got `AVERAGE`",
+                "1 issue",
+                "expected the first",
+                "<code>SUM</code>, but got <code>AVERAGE</code>",
             ],
-        ),
-        (
-            Mutation(["pivotTables", 0, 0, "columns", 0, "name"], "test"),
-            "A1",
-            False,
-            ["`1` mistake", "Don't give", "1st column", "a name"],
         ),
         (
             Deletion(["pivotTables", 0, 0, "columns", 0, "showTotals"]),
             "A1",
             False,
-            ["`1` mistake", "show the totals"],
+            ["1 issue", "totals", "first", "not showing"],
         ),
         (
             Deletion(["pivotTables", 0, 0, "values", 0, "calculatedDisplayType"]),
             "A1",
             False,
-            ["`1` mistake", "% of row", "the default"],
+            # TODO: message?
+            None,
         ),
         (
             Addition(
@@ -218,13 +217,13 @@ def solution_data_two_values(pivot_tables_two_values):
             ),
             "A1",
             False,
-            ["`1` mistake", "too many rows", "remove the 2nd row"],
+            ["1 issue", "The number of rows is incorrect"],
         ),
     ],
 )
 def test_check_pivots(solution_data, trans, sct_range, correct, message_contains):
     user_data = trans(deepcopy(solution_data))
-    sct = [{"range": sct_range, "sct": ["check_pivot"]}]
+    sct = [{"range": sct_range, "sct": ["Ex().has_equal_pivot()"]}]
     result = try_exercise(solution_data, user_data, sct)
 
     assert result.get("success") == correct
@@ -245,7 +244,7 @@ def test_check_pivots(solution_data, trans, sct_range, correct, message_contains
             Deletion(["pivotTables", 0, 0, "values", 1]),
             "A1",
             False,
-            ["`1` mistake", "defined enough"],
+            ["1 issue", "The number of values is incorrect"],
         ),
         (
             Addition(
@@ -254,7 +253,7 @@ def test_check_pivots(solution_data, trans, sct_range, correct, message_contains
             ),
             "A1",
             False,
-            ["`1` mistake", "too many rows"],
+            ["1 issue", "There are rows but there shouldn't be"],
         ),
         (
             Mutation(
@@ -263,7 +262,7 @@ def test_check_pivots(solution_data, trans, sct_range, correct, message_contains
             ),
             "A1",
             False,
-            ["`1` mistake", "don't have to define any columns"],
+            ["1 issue", "There are columns", "shouldn't be"],
         ),
     ],
 )
@@ -271,7 +270,7 @@ def test_check_pivots_two_values(
     solution_data_two_values, trans, sct_range, correct, message_contains
 ):
     user_data = trans(deepcopy(solution_data_two_values))
-    sct = [{"range": sct_range, "sct": ["check_pivot"]}]
+    sct = [{"range": sct_range, "sct": ["Ex().has_equal_pivot()"]}]
     result = try_exercise(solution_data_two_values, user_data, sct)
 
     assert result.get("success") == correct
