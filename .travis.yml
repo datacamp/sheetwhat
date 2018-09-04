@@ -11,3 +11,14 @@ install:
 script: pytest --cov=sheetwhat
 
 after_success: codecov
+
+deploy:
+  provider: pypi
+  user: datacamp
+  password:
+    secure: ULw8wc2hlt7bl7W94uzV4mOjt0mS7rkVkjIDsL4MNIDC93q9nDmK116au6ISMhcyxVA8r0h9hNV3QufZb0EpRyPk4p7fvT8tk77xaKDgwsyG4oZhFbJY76SPtpkMuT9l1lXALdhPr+vsOIq6Fiyh4JTYfAUSP+LvK4kN7qtROYiJqD4ruU8YpnhRL8uMISEdd3L/+JSw4r8qM5pMVQJRtNUysDUQJwdzEIoDYUsTRY4jHbLbLuKpztcgyvEuomvl3rWpl/hRJ8g40GhwhYilJUWPprCVhHkAQr7/7W6iGIIru+G2gFL4gU8Hsg0KYs3hMcaJpqnsG6wFlKGkqrAEd3JQkkruSllIw0PIGVlRYiv6jbirtcqHHgq0K2Dd0C/8ncRoJKSK+eNnz5MRNtc5ClYRP7U5CEKBO09bp4UeTQgU7RYY406P8erp5zEgXYIRf5n+DUemVuninBFAQrdD18rmmFISkhwJQju1y+Zcu0nvMdoKz2ED6dW0RiKp+9MDLAZrKtrk+jJo3Oa+P7HRm8EBSmS/ShwZVjm0ifutEprX1+CSjC8zXLNRZIb3pHJmdGb+LVJBvGl8h60ReVN8gsm20oiJx8DxByUKoSLlLbU6Ah2c49gQT1bDPrHgq0V2myz7paYpay3DNYYLpePx4RaY0DxbwFvoyMO4EjH2S8I=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: datacamp/sheetwhat
+    skip_upload_docs: true
