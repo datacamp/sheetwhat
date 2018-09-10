@@ -5,7 +5,7 @@ from sheetwhat.sct_syntax import SCT_CTX
 from sheetwhat.State import State
 
 
-def test_exercise(sct, student_data, solution_data):
+def test_exercise(sct, student_data, solution_data, success_msg=None):
     """
     """
 
@@ -13,16 +13,13 @@ def test_exercise(sct, student_data, solution_data):
     assert isinstance(student_data, dict)
     assert isinstance(solution_data, dict)
 
-    # Make sure state is created
-    if len(sct) == 0:
-        sct = [{}]
-
+    rep = Reporter()
     for single_sct in sct:
         state = State(
             student_data=student_data,
             solution_data=solution_data,
             sct_range=single_sct.get("range"),
-            reporter=Reporter(),
+            reporter=rep,
         )
 
         SCT_CTX["Ex"].root_state = state
@@ -32,4 +29,7 @@ def test_exercise(sct, student_data, solution_data):
         except TestFail as tf:
             return tf.payload
 
-    return state.reporter.build_final_payload()
+    if success_msg and isinstance(success_msg, str):
+        rep.success_msg = success_msg
+
+    return rep.build_final_payload()

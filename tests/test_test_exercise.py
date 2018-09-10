@@ -26,9 +26,22 @@ def test_empty():
     result = te(sct=[], student_data={}, solution_data={})
     assert result["correct"]
 
+@pytest.mark.parametrize(
+    "success_msg, patt",
+    [
+        (None, "Great work!"),
+        ("", "Great work!"),
+        ("you `rock`", "you <code>rock</code>"),
+    ],
+)
+def test_success_msg(success_msg, patt):
+    result = te(sct=[], student_data={}, solution_data={}, success_msg=success_msg)
+    assert result["correct"]
+    assert result["message"] == patt
 
 @pytest.mark.parametrize(
-    "sct, student_data, solution_data", [({}, [], []), ([], [], []), ([], {}, [])]
+    "sct, student_data, solution_data",
+    [({}, [], []), ([], [], []), ([], {}, [])],
 )
 def test_malformed(sct, student_data, solution_data):
     with pytest.raises(AssertionError):
