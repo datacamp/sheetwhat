@@ -21,10 +21,15 @@ def test_full(sct_range, sct, success):
     )
     assert result["correct"] == success
 
+
 def test_empty():
-    result = te(
-        sct = [],
-        student_data={},
-        solution_data={}
-    )
+    result = te(sct=[], student_data={}, solution_data={})
     assert result["correct"]
+
+
+@pytest.mark.parametrize(
+    "sct, student_data, solution_data", [({}, [], []), ([], [], []), ([], {}, [])]
+)
+def test_malformed(sct, student_data, solution_data):
+    with pytest.raises(AssertionError):
+        te(sct, student_data, solution_data)

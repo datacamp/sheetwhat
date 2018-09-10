@@ -9,8 +9,13 @@ def test_exercise(sct, student_data, solution_data):
     """
     """
 
+    assert isinstance(sct, list)
+    assert isinstance(student_data, dict)
+    assert isinstance(solution_data, dict)
+
     # Make sure state is created
-    if len(sct) == 0: sct = [{}]
+    if len(sct) == 0:
+        sct = [{}]
 
     for single_sct in sct:
         state = State(
