@@ -1,4 +1,4 @@
-from .utils import (
+from sheetwhat.utils import (
     crop_by_range,
     is_empty,
     round_array_2d,

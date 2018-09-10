@@ -1,5 +1,5 @@
 from sheetwhat.checks import check_range
-from .utils import is_empty
+from sheetwhat.utils import is_empty
 import glom
 import functools
 from protowhat import selectors

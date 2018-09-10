@@ -1,6 +1,6 @@
 import pytest
 
-from sheetwhat.checks.utils import (
+from sheetwhat.utils import (
     letters_to_numbers,
     range_to_row_columns,
     crop_by_range,
