@@ -269,6 +269,27 @@ def has_equal_chart(state, extra_msg=None):
             "spec.basicChart.chartType", "The chart type is not correct."
         )
 
+    if len(issues) == 0:
+        bound_rules["existence"](
+            f"spec.{solution_chart_type}.domains", "There is no XYZ specified."
+        )
+        bound_rules["array_equality"](
+            f"spec.{solution_chart_type}.domains", "The {ordinal} XYZ is not correct."
+        )
+        bound_rules["existence"](
+            f"spec.{solution_chart_type}.series", "There are no series specified."
+        )
+        bound_rules["array_equal_length"](
+            f"spec.{solution_chart_type}.series",
+            (
+                "The number of series is incorrect. "
+                "Expected {expected}, but got {actual}."
+            ),
+        )
+        bound_rules["array_equality"](
+            f"spec.{solution_chart_type}.series", ("The {ordinal} series is incorrect.")
+        )
+
     nb_issues = len(issues)
     if nb_issues > 0:
         _issues_msg = "\n".join([f"- {issue}" for issue in issues])

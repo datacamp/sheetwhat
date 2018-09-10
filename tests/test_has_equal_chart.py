@@ -239,10 +239,81 @@ def solution_data(charts):
     "trans, correct",
     [
         (Identity(), True),
+        (Mutation(["charts"], []), False),
         (Mutation(["charts", 0, "spec", "basicChart", "chartType"], "LINE"), False),
         (Mutation(["charts", 0, "spec", "title"], "Other title"), False),
         (Deletion(["charts", 0, "spec", "title"]), False),
         (Mutation(["charts", 0, "spec", "subTitle"], "something"), False),
+        (Deletion(["charts", 0, "spec", "basicChart", "domains", 0]), False),
+        (
+            Mutation(
+                [
+                    "charts",
+                    0,
+                    "spec",
+                    "basicChart",
+                    "domains",
+                    0,
+                    "domain",
+                    "sourceRange",
+                    "sources",
+                    0,
+                ],
+                {
+                    "startRowIndex": 1,
+                    "endRowIndex": 8,
+                    "startColumnIndex": 1,
+                    "endColumnIndex": 2,
+                },
+            ),
+            False,
+        ),
+        (Deletion(["charts", 0, "spec", "basicChart", "series", 0]), False),
+        (
+            Addition(
+                [
+                    "charts",
+                    0,
+                    "spec",
+                    "basicChart",
+                    "series",
+                    0,
+                    "series",
+                    "sourceRange",
+                    "sources",
+                ],
+                {
+                    "startRowIndex": 1,
+                    "endRowIndex": 8,
+                    "startColumnIndex": 5,
+                    "endColumnIndex": 6,
+                },
+            ),
+            False,
+        ),
+        (
+            Mutation(
+                [
+                    "charts",
+                    0,
+                    "spec",
+                    "basicChart",
+                    "series",
+                    0,
+                    "series",
+                    "sourceRange",
+                    "sources",
+                    0,
+                ],
+                {
+                    "startRowIndex": 1,
+                    "endRowIndex": 8,
+                    "startColumnIndex": 5,
+                    "endColumnIndex": 6,
+                },
+            ),
+            False,
+        ),
     ],
 )
 def test_check_charts(solution_data, trans, correct):
@@ -253,7 +324,6 @@ def test_check_charts(solution_data, trans, correct):
         has_equal_chart(s)
 
 
-@pytest.mark.debug
 @pytest.mark.parametrize(
     "trans, correct",
     [
