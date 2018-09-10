@@ -9,6 +9,9 @@ def test_exercise(sct, student_data, solution_data):
     """
     """
 
+    # Make sure state is created
+    if len(sct) == 0: sct = [{}]
+
     for single_sct in sct:
         state = State(
             student_data=student_data,

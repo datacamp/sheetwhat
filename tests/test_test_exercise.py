@@ -20,3 +20,11 @@ def test_full(sct_range, sct, success):
         solution_data={"values": [["A", "A"]], "formulas": [["=A1", "=A1"]]},
     )
     assert result["correct"] == success
+
+def test_empty():
+    result = te(
+        sct = [],
+        student_data={},
+        solution_data={}
+    )
+    assert result["correct"]
