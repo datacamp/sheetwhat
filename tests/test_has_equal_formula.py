@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from helper import Identity, Mutation, setup_state, verify_success
+from tests.helper import Identity, Mutation, setup_state, verify_success
 from sheetwhat.checks import has_equal_formula
 
 # Fixtures
