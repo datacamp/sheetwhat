@@ -71,12 +71,10 @@ target/
 # Ipython Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
-
 # Mac stuff -------------------------------------------------------------------
 .DS_Store
 tests/.DS_Store
 
 # Custom
 .pytest_cache/*
+
