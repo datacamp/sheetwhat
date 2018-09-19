@@ -1,6 +1,6 @@
 import importlib
 import pytest
-from helper import setup_state
+from tests.helper import setup_state
 from protowhat.Test import TestFail as TF
 from sheetwhat.checks import *
 

@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from helper import verify_success, setup_state
+from tests.helper import verify_success, setup_state
 from sheetwhat.checks import check_function
 
 # Fixtures

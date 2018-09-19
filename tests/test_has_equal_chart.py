@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from helper import (
+from tests.helper import (
     Identity,
     Mutation,
     setup_state,

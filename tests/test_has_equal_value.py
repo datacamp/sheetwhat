@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from helper import Identity, Mutation, Deletion, setup_state, verify_success
+from tests.helper import Identity, Mutation, Deletion, setup_state, verify_success
 from sheetwhat.checks import check_range, has_equal_value
 
 
