@@ -7,6 +7,7 @@ from sheetwhat.utils import (
     is_empty,
     normalize_array_2d,
     map_2d,
+    dict_keys,
 )
 
 
@@ -113,3 +114,19 @@ def test_normalize_array_2d(array_2d, target):
 )
 def test_map_2d(array_2d, func, target):
     assert map_2d(func, array_2d) == target
+
+
+@pytest.mark.parametrize(
+    "dicts, result",
+    [
+        ([{"a": 1}], {"a"}),
+        (["test"], set()),
+        ([{"a": 2, "b": 5}], {"a", "b"}),
+        ("test", set()),
+        ([{"a": 2, "b": 5}, {"c": 2}], {"a", "b", "c"}),
+        ([{"a": 2, "b": 5}, {"a": 2}], {"a", "b"}),
+        ([{"a": 2, "b": 5}, {"a": 2, "c": 8}], {"a", "b", "c"}),
+    ],
+)
+def test_dict_keys(dicts, result):
+    assert dict_keys(*dicts) == result
