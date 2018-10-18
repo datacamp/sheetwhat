@@ -1,5 +1,5 @@
 from sheetwhat.checks import check_range
-from sheetwhat.utils import is_empty
+from sheetwhat.utils import is_empty, dict_keys
 import glom
 import functools
 from protowhat import selectors
@@ -71,6 +71,24 @@ class ArrayEqualLengthRule(Rule):
             )
 
 
+class DictKeyEqualityRule(Rule):
+    def __call__(self, path, message):
+        solution_dict = safe_glom(self.solution_pivot_table, path)
+        student_dict = safe_glom(self.student_pivot_table, path)
+        if not isinstance(student_dict, dict):
+            return
+        if not isinstance(solution_dict, dict):
+            return
+        solution_key_set = set(solution_dict.keys())
+        student_key_set = set(student_dict.keys())
+        if solution_key_set != student_key_set:
+            self.issues.append(
+                message.format(
+                    solution_keys=solution_key_set, student_keys=student_key_set
+                )
+            )
+
+
 class EqualityRule(Rule):
     def __call__(self, path, message):
         solution_field = safe_glom(self.solution_pivot_table, path)
@@ -100,6 +118,7 @@ class OverExistenceRule(Rule):
 rule_types = {
     "array_equal_length": ArrayEqualLengthRule,
     "array_equality": ArrayEqualityRule,
+    "dict_key_equality": DictKeyEqualityRule,
     "equality": EqualityRule,
     "existence": ExistenceRule,
     "over_existence": OverExistenceRule,
@@ -213,6 +232,18 @@ def has_equal_pivot(state, extra_msg=None):
                     "The number of columns is incorrect. "
                     "Expected {expected}, but got {actual}."
                 ),
+            )
+
+            for key in dict_keys(
+                safe_glom(solution_pivot_table, "criteria"),
+                safe_glom(student_pivot_table, "criteria"),
+            ):
+                bound_rules["array_equal_length"](
+                    f"criteria.{key}.visibleValues", "error"
+                )
+
+            bound_rules["dict_key_equality"](
+                "criteria", "The rows or columns used in the filter are incorrect."
             )
 
             nb_issues = len(issues)

@@ -97,6 +97,43 @@ def pivot_tables_two_values():
 
 
 @pytest.fixture()
+def pivot_tables_with_criteria():
+    return [
+        [
+            {
+                "source": {
+                    "sheetId": 1099865763,
+                    "startRowIndex": 0,
+                    "endRowIndex": 613,
+                    "startColumnIndex": 0,
+                    "endColumnIndex": 5,
+                },
+                "rows": [
+                    {
+                        "sourceColumnOffset": 2,
+                        "showTotals": True,
+                        "sortOrder": "ASCENDING",
+                    }
+                ],
+                "criteria": {
+                    "2": {
+                        "visibleValues": [
+                            "Los Angeles, California",
+                            "Riverside, California",
+                            "Sacramento, California",
+                            "San Diego, California",
+                            "San Francisco, California",
+                            "San Jose, California",
+                        ]
+                    }
+                },
+                "values": [{"sourceColumnOffset": 4, "summarizeFunction": "SUM"}],
+            }
+        ]
+    ]
+
+
+@pytest.fixture()
 def solution_data(pivot_tables):
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
@@ -111,6 +148,15 @@ def solution_data_two_values(pivot_tables_two_values):
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
         "pivotTables": pivot_tables_two_values,
+    }
+
+
+@pytest.fixture()
+def solution_data_criteria(pivot_tables_with_criteria):
+    return {
+        "values": [[1, 1, 1], [1, 52, 8]],
+        "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
+        "pivotTables": pivot_tables_with_criteria,
     }
 
 
@@ -268,5 +314,48 @@ def test_check_pivots_two_values(
 ):
     user_data = trans(deepcopy(solution_data_two_values))
     s = setup_state(user_data, solution_data_two_values, sct_range)
+    with verify_success(correct, message_contains):
+        has_equal_pivot(s)
+
+
+@pytest.mark.debug
+@pytest.mark.parametrize(
+    "trans, sct_range, correct, message_contains",
+    [
+        (Identity(), "A1", True, None),
+        (
+            Deletion(["pivotTables", 0, 0, "criteria", "2", "visibleValues", 0]),
+            "A1",
+            False,
+            None,
+        ),
+        (
+            Addition(
+                ["pivotTables", 0, 0, "criteria", "2", "visibleValues"],
+                "Atlanta, Georgia",
+            ),
+            "A1",
+            False,
+            None,
+        ),
+        (
+            compose(
+                Deletion(["pivotTables", 0, 0, "criteria", "2"]),
+                Mutation(
+                    ["pivotTables", 0, 0, "criteria", "1"],
+                    {"visibleValues": ["test", "one", "two", "three"]},
+                ),
+            ),
+            "A1",
+            False,
+            "error",
+        ),
+    ],
+)
+def test_check_pivot_criteria(
+    solution_data_criteria, trans, sct_range, correct, message_contains
+):
+    user_data = trans(deepcopy(solution_data_criteria))
+    s = setup_state(user_data, solution_data_criteria, sct_range)
     with verify_success(correct, message_contains):
         has_equal_pivot(s)

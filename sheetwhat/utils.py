@@ -83,3 +83,11 @@ def normalize_array_2d(array_2d):
 
 def map_2d(func, array_2d):
     return [[func(cell) for cell in row] for row in array_2d]
+
+
+def dict_keys(*dicts):
+    key_set = set()
+    for dict_i in dicts:
+        if isinstance(dict_i, dict):
+            key_set = key_set | set(dict_i)
+    return key_set
