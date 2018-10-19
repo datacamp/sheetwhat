@@ -134,6 +134,37 @@ def pivot_tables_with_criteria():
 
 
 @pytest.fixture()
+def pivot_tables_with_calculated_field():
+    return [
+        [
+            {
+                "source": {
+                    "sheetId": 1099865763,
+                    "startRowIndex": 0,
+                    "endRowIndex": 613,
+                    "startColumnIndex": 0,
+                    "endColumnIndex": 5,
+                },
+                "rows": [
+                    {
+                        "sourceColumnOffset": 2,
+                        "showTotals": True,
+                        "sortOrder": "ASCENDING",
+                    }
+                ],
+                "values": [
+                    {
+                        "formula": "= Inches / Days",
+                        "summarizeFunction": "CUSTOM",
+                        "name": "Calculated Field 1",
+                    }
+                ],
+            }
+        ]
+    ]
+
+
+@pytest.fixture()
 def solution_data(pivot_tables):
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
@@ -157,6 +188,15 @@ def solution_data_criteria(pivot_tables_with_criteria):
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
         "pivotTables": pivot_tables_with_criteria,
+    }
+
+
+@pytest.fixture()
+def solution_data_calculated_field(pivot_tables_with_calculated_field):
+    return {
+        "values": [[1, 1, 1], [1, 52, 8]],
+        "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
+        "pivotTables": pivot_tables_with_calculated_field,
     }
 
 
@@ -318,7 +358,6 @@ def test_check_pivots_two_values(
         has_equal_pivot(s)
 
 
-@pytest.mark.debug
 @pytest.mark.parametrize(
     "trans, sct_range, correct, message_contains",
     [
@@ -366,5 +405,49 @@ def test_check_pivot_criteria(
 ):
     user_data = trans(deepcopy(solution_data_criteria))
     s = setup_state(user_data, solution_data_criteria, sct_range)
+    with verify_success(correct, message_contains):
+        has_equal_pivot(s)
+
+
+@pytest.mark.debug
+@pytest.mark.parametrize(
+    "trans, sct_range, correct, message_contains",
+    [
+        (Identity(), "A1", True, None),
+        (
+            Mutation(
+                ["pivotTables", 0, 0, "values", 0, "formula"], "= Inches         / Days"
+            ),
+            "A1",
+            True,
+            None,
+        ),
+        (
+            Mutation(["pivotTables", 0, 0, "values", 0, "formula"], "=inches/days"),
+            "A1",
+            True,
+            None,
+        ),
+        (
+            Mutation(
+                ["pivotTables", 0, 0, "values", 0, "formula"], "=wrong_inches/days"
+            ),
+            "A1",
+            False,
+            r"1 issue(.|\s)*first value(.|\s)*calculated field",
+        ),
+        (
+            Deletion(["pivotTables", 0, 0, "values", 0, "formula"]),
+            "A1",
+            False,
+            r"1 issue(.|\s)*first value(.|\s)*calculated field",
+        ),
+    ],
+)
+def test_check_pivot_calculated_fields(
+    solution_data_calculated_field, trans, sct_range, correct, message_contains
+):
+    user_data = trans(deepcopy(solution_data_calculated_field))
+    s = setup_state(user_data, solution_data_calculated_field, sct_range)
     with verify_success(correct, message_contains):
         has_equal_pivot(s)
