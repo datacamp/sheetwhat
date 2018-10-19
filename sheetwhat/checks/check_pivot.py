@@ -115,6 +115,20 @@ class OverExistenceRule(Rule):
             self.issues.append(message)
 
 
+class SetEqualityRule(Rule):
+    def __call__(self, path, message):
+        solution_array = safe_glom(self.solution_pivot_table, path)
+        student_array = safe_glom(self.student_pivot_table, path)
+        if not isinstance(student_array, list):
+            return
+        if not isinstance(solution_array, list):
+            return
+        solution_set = set(solution_array)
+        student_set = set(student_array)
+        if solution_set != student_set:
+            self.issues.append(message)
+
+
 rule_types = {
     "array_equal_length": ArrayEqualLengthRule,
     "array_equality": ArrayEqualityRule,
@@ -122,6 +136,7 @@ rule_types = {
     "equality": EqualityRule,
     "existence": ExistenceRule,
     "over_existence": OverExistenceRule,
+    "set_equality": SetEqualityRule,
 }
 
 
@@ -234,17 +249,16 @@ def has_equal_pivot(state, extra_msg=None):
                 ),
             )
 
+            bound_rules["dict_key_equality"](
+                "criteria", "The rows or columns used in the filter are incorrect."
+            )
             for key in dict_keys(
                 safe_glom(solution_pivot_table, "criteria"),
                 safe_glom(student_pivot_table, "criteria"),
             ):
-                bound_rules["array_equal_length"](
+                bound_rules["set_equality"](
                     f"criteria.{key}.visibleValues", "error"
                 )
-
-            bound_rules["dict_key_equality"](
-                "criteria", "The rows or columns used in the filter are incorrect."
-            )
 
             nb_issues = len(issues)
             if nb_issues > 0:
