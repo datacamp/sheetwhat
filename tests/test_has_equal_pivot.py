@@ -348,7 +348,16 @@ def test_check_pivots_two_values(
             ),
             "A1",
             False,
-            "error",
+            None,
+        ),
+        (
+            Mutation(
+                ["pivotTables", 0, 0, "criteria", "2", "visibleValues", 0],
+                "something else",
+            ),
+            "A1",
+            False,
+            None,
         ),
     ],
 )
