@@ -1,5 +1,5 @@
 from sheetwhat.checks import check_range
-from sheetwhat.utils import is_empty, dict_keys
+from sheetwhat.utils import is_empty, dict_keys, normalize_formula
 import glom
 import functools
 from protowhat import selectors
@@ -29,7 +29,7 @@ class Rule:
 
 
 class ArrayEqualityRule(Rule):
-    def __call__(self, path, message):
+    def __call__(self, path, message, equal_func=lambda x, y: x == y):
         solution_array = safe_glom(self.solution_pivot_table, path)
         student_array = safe_glom(self.student_pivot_table, path)
         if not isinstance(student_array, list):
@@ -37,7 +37,7 @@ class ArrayEqualityRule(Rule):
         if not isinstance(solution_array, list):
             return
         if solution_array != student_array:
-            matches = [x == y for x, y in zip(student_array, solution_array)]
+            matches = [equal_func(x, y) for x, y in zip(student_array, solution_array)]
             mismatch_reducer = lambda all, x: all if x[1] else [*all, x[0]]
             mismatch_indices = functools.reduce(
                 mismatch_reducer, enumerate(matches), []
@@ -117,9 +117,7 @@ class SetEqualityRule(Rule):
     def __call__(self, path, message):
         solution_array = safe_glom(self.solution_pivot_table, path)
         student_array = safe_glom(self.student_pivot_table, path)
-        if not isinstance(student_array, list):
-            return
-        if not isinstance(solution_array, list):
+        if not isinstance(student_array, list) or not isinstance(solution_array, list):
             return
         solution_set = set(solution_array)
         student_set = set(student_array)
@@ -258,6 +256,12 @@ def has_equal_pivot(state, extra_msg=None):
                     f"criteria.{key}.visibleValues",
                     "The filtered out values are incorrect.",
                 )
+
+            bound_rules["array_equality"](
+                ("values", ["formula"]),
+                "The {ordinal} value does not contain the correct calculated field.",
+                lambda x, y: normalize_formula(x) == normalize_formula(y),
+            )
 
             nb_issues = len(issues)
             if nb_issues > 0:
