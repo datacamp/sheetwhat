@@ -75,9 +75,7 @@ class DictKeyEqualityRule(Rule):
     def __call__(self, path, message):
         solution_dict = safe_glom(self.solution_pivot_table, path)
         student_dict = safe_glom(self.student_pivot_table, path)
-        if not isinstance(student_dict, dict):
-            return
-        if not isinstance(solution_dict, dict):
+        if not isinstance(student_dict, dict) or not isinstance(solution_dict, dict):
             return
         solution_key_set = set(solution_dict.keys())
         student_key_set = set(student_dict.keys())
@@ -257,7 +255,8 @@ def has_equal_pivot(state, extra_msg=None):
                 safe_glom(student_pivot_table, "criteria"),
             ):
                 bound_rules["set_equality"](
-                    f"criteria.{key}.visibleValues", "error"
+                    f"criteria.{key}.visibleValues",
+                    "The filtered out values are incorrect.",
                 )
 
             nb_issues = len(issues)
