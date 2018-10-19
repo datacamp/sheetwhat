@@ -327,7 +327,7 @@ def test_check_pivots_two_values(
             Deletion(["pivotTables", 0, 0, "criteria", "2", "visibleValues", 0]),
             "A1",
             False,
-            None,
+            r"1 issue(.|\s)*filtered out values(.|\s)*incorrect",
         ),
         (
             Addition(
@@ -336,7 +336,16 @@ def test_check_pivots_two_values(
             ),
             "A1",
             False,
-            None,
+            r"1 issue(.|\s)*filtered out values(.|\s)*incorrect",
+        ),
+        (
+            Mutation(
+                ["pivotTables", 0, 0, "criteria", "2", "visibleValues", 0],
+                "something else",
+            ),
+            "A1",
+            False,
+            r"1 issue(.|\s)*filtered out values(.|\s)*incorrect",
         ),
         (
             compose(
@@ -348,16 +357,7 @@ def test_check_pivots_two_values(
             ),
             "A1",
             False,
-            None,
-        ),
-        (
-            Mutation(
-                ["pivotTables", 0, 0, "criteria", "2", "visibleValues", 0],
-                "something else",
-            ),
-            "A1",
-            False,
-            None,
+            r"1 issue(.|\s)*rows or columns used(.|\s)*incorrect",
         ),
     ],
 )
