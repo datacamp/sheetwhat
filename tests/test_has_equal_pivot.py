@@ -409,7 +409,6 @@ def test_check_pivot_criteria(
         has_equal_pivot(s)
 
 
-@pytest.mark.debug
 @pytest.mark.parametrize(
     "trans, sct_range, correct, message_contains",
     [
