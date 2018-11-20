@@ -47,3 +47,14 @@ def test_success_msg(success_msg, patt):
 def test_malformed(sct, student_data, solution_data):
     with pytest.raises(AssertionError):
         te(sct, student_data, solution_data)
+
+
+def test_format_string_messaging():
+    sct_range = "A1"
+    sct = 'Ex().check_operator(operator="<", missing_msg="Check cell `{range}` again.")'
+    result = te(
+        sct=[{"range": sct_range, "sct": [sct]}],
+        student_data={"values": [["A", "B"]], "formulas": [["=A1", "=B1"]]},
+        solution_data={"values": [["A", "A"]], "formulas": [["=A1", "=A1"]]},
+    )
+    assert result["message"] == "Check cell <code>A1</code> again."
