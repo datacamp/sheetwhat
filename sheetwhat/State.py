@@ -20,3 +20,9 @@ class State(BaseState):
         child.solution_data = solution_data
         child.parent = self
         return child
+
+    def to_message_exposed_dict(self):
+        """This dictionary is passed through to the message formatter. The fields
+        defined in the dictionary can be replaced by values in the state by using
+        the classical {field} notation."""
+        return {"range": self.sct_range}

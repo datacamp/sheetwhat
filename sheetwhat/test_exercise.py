@@ -27,7 +27,12 @@ def test_exercise(sct, student_data, solution_data, success_msg=None):
         try:
             exec("\n".join(single_sct.get("sct", [])), SCT_CTX)
         except TestFail as tf:
-            return tf.payload
+            return {
+                **tf.payload,
+                "message": tf.payload["message"].format(
+                    **state.to_message_exposed_dict()
+                ),
+            }
 
     if success_msg and isinstance(success_msg, str):
         rep.success_msg = success_msg
