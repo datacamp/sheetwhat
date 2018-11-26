@@ -16,7 +16,9 @@ def check_range(state, field, field_msg, missing_msg=None):
     solution_field_content = crop_by_range(state.solution_data[field], state.sct_range)
 
     if is_empty(student_field_content):
-        _msg = missing_msg or f"Please fill in a {field_msg} in `{state.sct_range}`."
+        _msg = (missing_msg or "Please fill in a {field_msg} in `{range}`.").format(
+            field_msg=field_msg, **state.to_message_exposed_dict()
+        )
         state.do_test(_msg)
 
     return state.to_child(
@@ -39,9 +41,8 @@ def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x
 
     if not all([all(row) for row in student_matches]):
         _msg = (
-            incorrect_msg
-            or f"In cell `{state.sct_range}`, did you use the correct formula?"
-        )
+            incorrect_msg or "In cell `{range}`, did you use the correct formula?"
+        ).format(**state.to_message_exposed_dict())
         child.do_test(_msg)
 
     return state
@@ -49,9 +50,9 @@ def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x
 
 def check_function(state, name, missing_msg=None):
     missing_msg = (
-        missing_msg
-        or f"In cell `{state.sct_range}`, did you use the `{name}()` function?"
-    )
+        missing_msg or "In cell `{range}`, did you use the `{name}()` function?"
+    ).format(name=name, **state.to_message_exposed_dict())
+
     has_code(
         state,
         pattern=name,
@@ -65,9 +66,8 @@ def check_function(state, name, missing_msg=None):
 
 def check_operator(state, operator, missing_msg=None):
     missing_msg = (
-        missing_msg
-        or f"In cell `{state.sct_range}`, did you use the `{operator}` operator?"
-    )
+        missing_msg or "In cell `{range}`, did you use the `{operator}` operator?"
+    ).format(operator=operator, **state.to_message_exposed_dict())
     has_code(
         state,
         pattern=operator,
@@ -86,7 +86,10 @@ def has_equal_value(state, incorrect_msg=None, ndigits=4):
     solution_values_rounded = round_array_2d(child.solution_data["values"], ndigits)
 
     if student_values_rounded != solution_values_rounded:
-        _msg = incorrect_msg or f"The value at `{child.sct_range}` is not correct."
+        _msg = (incorrect_msg or "The value at `{range}` is not correct.").format(
+            **child.to_message_exposed_dict()
+        )
+
         child.do_test(_msg)
 
     return state
@@ -100,9 +103,8 @@ def has_equal_formula(state, incorrect_msg=None, ndigits=4):
 
     if student_formulas_normalized != solution_formulas_normalized:
         _msg = (
-            incorrect_msg
-            or f"In cell `{state.sct_range}`, did you use the correct formula?"
-        )
+            incorrect_msg or "In cell `{range}`, did you use the correct formula?"
+        ).format(**state.to_message_exposed_dict())
         child.do_test(_msg)
 
     return state
@@ -128,8 +130,14 @@ def has_equal_references(state, absolute=False, incorrect_msg=None):
             for reference in solution_references:
                 if normalize_formula(reference) not in normalize_formula(student_cell):
                     _msg = (
-                        f"In cell `{child.sct_range}`, did you use the "
-                        f"{('absolute ' if absolute else '')}"
-                        f"reference `{reference}`?"
+                        incorrect_msg
+                        or (
+                            "In cell `{range}`, did you use the{absolute_str} "
+                            "reference `{reference}`?"
+                        )
+                    ).format(
+                        absolute_str=" absolute" if absolute else "",
+                        reference=reference,
+                        **child.to_message_exposed_dict()
                     )
                     child.do_test(_msg)

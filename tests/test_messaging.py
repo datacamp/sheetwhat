@@ -69,3 +69,13 @@ def test_has_equal_reference_bas():
         TF, match=r"In cell `A1`, did you use the absolute reference `\$B\$1`\?"
     ):
         has_equal_references(s, absolute=True)
+
+
+def test_format_string_messaging():
+    s = setup_state(
+        {"values": [["A", "B"]], "formulas": [["=A1", "=B1"]]},
+        {"values": [["A", "A"]], "formulas": [["=A1", "=A1"]]},
+        "A1",
+    )
+    with pytest.raises(TF, match=r"Check cell `A1` again."):
+        check_operator(s, operator="<", missing_msg="Check cell `{range}` again.")
