@@ -2,6 +2,12 @@
 
 All notable changes to the sheetwhat project will be documented in this file.
 
+## 0.1.4
+
+### Added
+
+- Custom feedback messages can now be templated and use the same parameters as the default messages;
+
 ## 0.1.3
 
 ### Added
