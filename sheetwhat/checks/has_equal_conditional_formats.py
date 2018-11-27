@@ -1,4 +1,5 @@
 from .rules import rule_types
+from protowhat import selectors
 
 
 def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
@@ -6,26 +7,42 @@ def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
     solution_cond_formats = state.solution_data["conditionalFormats"]
 
     issues = []
-    bound_rules = {
-        key: RuleClass(student_cond_formats, solution_cond_formats, issues)
-        for key, RuleClass in rule_types.items()
-    }
 
-    bound_rules["array_equality"](
-        ["ranges"], "There ranges of the {ordinal} rule are incorrect."
-    ),
-    bound_rules["array_equality"](
-        ["booleanRule.condition"], "There condition of the {ordinal} rule is incorrect."
-    ),
-    bound_rules["array_equality"](
-        ["gradientRule.condition"], "There condition of the {ordinal} is incorrect."
-    ),
-    bound_rules["array_equality"](
-        ["booleanRule.format"], "There format of the {ordinal} rule is incorrect."
-    ),
-    bound_rules["array_equality"](
-        ["gradientRule.format"], "There format of the {ordinal} rule is incorrect."
-    ),
+    for i, (student_cond_format, solution_cond_format) in enumerate(
+        zip(student_cond_formats, solution_cond_formats)
+    ):
+        ordinal = selectors.get_ord(i + 1)
+        bound_rules = {
+            key: RuleClass(student_cond_format, solution_cond_format, issues)
+            for key, RuleClass in rule_types.items()
+        }
+
+        bound_rules["existence"](
+            "booleanRule", f"The {ordinal} rule is incorrect, expected single color."
+        )
+        bound_rules["existence"](
+            "gradientRule", f"The {ordinal} rule is incorrect, expected color scale."
+        )
+        if len(issues) == 0:
+            bound_rules["equality"](
+                "ranges", f"There ranges of the {ordinal} rule are incorrect."
+            )
+            bound_rules["equality"](
+                "booleanRule.condition",
+                f"There condition of the {ordinal} rule is incorrect.",
+            )
+            bound_rules["equality"](
+                "gradientRule.condition",
+                f"There condition of the {ordinal} is incorrect.",
+            )
+            bound_rules["equality"](
+                "booleanRule.format",
+                f"There format of the {ordinal} rule is incorrect.",
+            )
+            bound_rules["equality"](
+                "gradientRule.format",
+                f"There format of the {ordinal} rule is incorrect.",
+            )
 
     nb_issues = len(issues)
     if nb_issues > 0:
