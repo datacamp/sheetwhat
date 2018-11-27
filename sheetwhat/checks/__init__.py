@@ -7,9 +7,9 @@ from sheetwhat.checks.check_funcs import (
     check_function,
     check_operator,
 )
-from sheetwhat.checks.check_pivot import has_equal_pivot
-from sheetwhat.checks.check_pivot import has_equal_chart
-from sheetwhat.checks.check_conditional_formats import has_equal_conditional_formats
+from sheetwhat.checks.has_equal_pivot import has_equal_pivot
+from sheetwhat.checks.has_equal_charts import has_equal_charts
+from sheetwhat.checks.has_equal_conditional_formats import has_equal_conditional_formats
 
 # don't import some funcs from protowhat that don't make sense:
 # - check_node, check_edge and has_equal_ast don't work well.
