@@ -139,7 +139,7 @@ def test_has_equal_conditional_formats(solution_data, trans, correct, match):
                 ["conditionalFormats", 1, "gradientRule", "minpoint", "type"], "NUMBER"
             ),
             False,
-            "second .* minpoint",
+            "minpoint .* second",
         ),
     ],
 )
