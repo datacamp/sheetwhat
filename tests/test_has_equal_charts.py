@@ -10,7 +10,7 @@ from tests.helper import (
     Addition,
 )
 
-from sheetwhat.checks import has_equal_chart
+from sheetwhat.checks import has_equal_charts
 
 # Fixtures
 @pytest.fixture()
@@ -321,7 +321,7 @@ def test_check_charts(solution_data, trans, correct):
     # sct_range is irrelevant in charts
     s = setup_state(user_data, solution_data, "A1")
     with verify_success(correct):
-        has_equal_chart(s)
+        has_equal_charts(s)
 
 
 @pytest.mark.parametrize(
@@ -359,4 +359,4 @@ def test_check_charts_trans_on_solution(solution_data, trans, correct):
     # sct_range is irrelevant in charts
     s = setup_state(user_data, solution_data, "A1")
     with verify_success(correct):
-        has_equal_chart(s)
+        has_equal_charts(s)
