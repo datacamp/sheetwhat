@@ -134,6 +134,13 @@ def test_has_equal_conditional_formats(solution_data, trans, correct, match):
             False,
             "second .* color scale",
         ),
+        (
+            Mutation(
+                ["conditionalFormats", 1, "gradientRule", "minpoint", "type"], "NUMBER"
+            ),
+            False,
+            "second .* minpoint",
+        ),
     ],
 )
 def test_has_equal_conditional_formats_2(solution_data_2, trans, correct, match):
