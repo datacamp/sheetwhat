@@ -236,15 +236,24 @@ def solution_data(charts):
 
 # Tests
 @pytest.mark.parametrize(
-    "trans, correct",
+    "trans, correct, match",
     [
-        (Identity(), True),
-        (Mutation(["charts"], []), False),
-        (Mutation(["charts", 0, "spec", "basicChart", "chartType"], "LINE"), False),
-        (Mutation(["charts", 0, "spec", "title"], "Other title"), False),
-        (Deletion(["charts", 0, "spec", "title"]), False),
-        (Mutation(["charts", 0, "spec", "subTitle"], "something"), False),
-        (Deletion(["charts", 0, "spec", "basicChart", "domains", 0]), False),
+        (Identity(), True, None),
+        (Mutation(["charts"], []), False, "Please create a chart near `E1`."),
+        (
+            Mutation(["charts", 0, "spec", "basicChart", "chartType"], "LINE"),
+            False,
+            "The chart type is not correct.",
+        ),
+        (Mutation(["charts", 0, "spec", "title"], "Other title"), False, None),
+        (
+            Mutation(["charts", 0, "spec", "title"], "Other title"),
+            False,
+            "close to `E1`",
+        ),
+        (Deletion(["charts", 0, "spec", "title"]), False, "1 issue"),
+        (Mutation(["charts", 0, "spec", "subTitle"], "something"), False, "1 issue"),
+        (Deletion(["charts", 0, "spec", "basicChart", "domains", 0]), False, "1 issue"),
         (
             Mutation(
                 [
@@ -267,8 +276,9 @@ def solution_data(charts):
                 },
             ),
             False,
+            "X-axis",
         ),
-        (Deletion(["charts", 0, "spec", "basicChart", "series", 0]), False),
+        (Deletion(["charts", 0, "spec", "basicChart", "series", 0]), False, None),
         (
             Addition(
                 [
@@ -290,6 +300,7 @@ def solution_data(charts):
                 },
             ),
             False,
+            None,
         ),
         (
             Mutation(
@@ -313,14 +324,15 @@ def solution_data(charts):
                 },
             ),
             False,
+            None,
         ),
     ],
 )
-def test_has_equal_chart(solution_data, trans, correct):
+def test_has_equal_chart(solution_data, trans, correct, match):
     user_data = trans(deepcopy(solution_data))
     # sct_range is irrelevant in charts
     s = setup_state(user_data, solution_data, "E1")
-    with verify_success(correct):
+    with verify_success(correct, match=match):
         has_equal_chart(s)
 
 
@@ -356,7 +368,6 @@ def test_has_equal_chart(solution_data, trans, correct):
 def test_has_equal_chart_trans_on_solution(solution_data, trans, correct):
     user_data = deepcopy(solution_data)
     solution_data = trans(deepcopy(solution_data))
-    # sct_range is irrelevant in charts
     s = setup_state(user_data, solution_data, "E1")
     with verify_success(correct):
         has_equal_chart(s)
@@ -395,7 +406,6 @@ def test_has_equal_chart_trans_on_solution(solution_data, trans, correct):
 def test_has_equal_chart_trans_on_other_chart(solution_data, trans, correct):
     user_data = deepcopy(solution_data)
     solution_data = trans(deepcopy(solution_data))
-    # sct_range is irrelevant in charts
     s = setup_state(user_data, solution_data, "A1")
     with verify_success(correct):
         has_equal_chart(s)
