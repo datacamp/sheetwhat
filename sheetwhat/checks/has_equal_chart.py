@@ -1,3 +1,5 @@
+import functools
+from ..utils import range_to_row_columns
 from .rules import rule_types, safe_glom
 
 
@@ -17,11 +19,30 @@ def infer_chart_type(chart):
             return chart_type
 
 
-def has_equal_charts(state, extra_msg=None):
-    solution_chart = state.solution_data["charts"][0]
+def manhatten_distance_to_chart(chart, sct_range_str):
+    anchor_cell = safe_glom(chart, "position.overlayPosition.anchorCell")
+    x = safe_glom(anchor_cell, "columnIndex", 0)
+    y = safe_glom(anchor_cell, "rowIndex", 0)
+    sct_range = range_to_row_columns(sct_range_str)
+    x_sct = safe_glom(sct_range, "start_column", 0)
+    y_sct = safe_glom(sct_range, "start_row", 0)
+    return abs(x - x_sct) + abs(y - y_sct)
+
+
+def find_chart(sct_range, charts):
+    distance_to_sct = functools.partial(
+        manhatten_distance_to_chart, sct_range_str=sct_range
+    )
+    distances = [distance_to_sct(chart) for chart in charts]
+    min_distance_index = distances.index(min(distances))
+    return charts[min_distance_index]
+
+
+def has_equal_chart(state, extra_msg=None):
+    solution_chart = find_chart(state.sct_range, state.solution_data["charts"])
     if len(state.student_data["charts"]) == 0:
         state.do_test("Please create a chart.")
-    student_chart = state.student_data["charts"][0]
+    student_chart = find_chart(state.sct_range, state.student_data["charts"])
     issues = []
     bound_rules = {
         key: RuleClass(student_chart, solution_chart, issues)
