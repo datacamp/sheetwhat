@@ -10,7 +10,7 @@ from tests.helper import (
     Addition,
 )
 
-from sheetwhat.checks import has_equal_charts
+from sheetwhat.checks import has_equal_chart
 
 # Fixtures
 @pytest.fixture()
@@ -316,12 +316,12 @@ def solution_data(charts):
         ),
     ],
 )
-def test_check_charts(solution_data, trans, correct):
+def test_has_equal_chart(solution_data, trans, correct):
     user_data = trans(deepcopy(solution_data))
     # sct_range is irrelevant in charts
-    s = setup_state(user_data, solution_data, "A1")
+    s = setup_state(user_data, solution_data, "E1")
     with verify_success(correct):
-        has_equal_charts(s)
+        has_equal_chart(s)
 
 
 @pytest.mark.parametrize(
@@ -353,10 +353,49 @@ def test_check_charts(solution_data, trans, correct):
         )
     ],
 )
-def test_check_charts_trans_on_solution(solution_data, trans, correct):
+def test_has_equal_chart_trans_on_solution(solution_data, trans, correct):
+    user_data = deepcopy(solution_data)
+    solution_data = trans(deepcopy(solution_data))
+    # sct_range is irrelevant in charts
+    s = setup_state(user_data, solution_data, "E1")
+    with verify_success(correct):
+        has_equal_chart(s)
+
+
+@pytest.mark.parametrize(
+    "trans, correct",
+    [
+        (Identity(), True),
+        (
+            compose(
+                Deletion(["charts", 0, "spec", "basicChart"]),
+                Mutation(
+                    ["charts", 0, "spec", "pieChart"],
+                    {
+                        "domain": {
+                            "sourceRange": {
+                                "sources": [
+                                    {
+                                        "sheetId": 1964080503,
+                                        "startRowIndex": 0,
+                                        "endRowIndex": 4,
+                                        "startColumnIndex": 0,
+                                        "endColumnIndex": 1,
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                ),
+            ),
+            True,
+        ),
+    ],
+)
+def test_has_equal_chart_trans_on_other_chart(solution_data, trans, correct):
     user_data = deepcopy(solution_data)
     solution_data = trans(deepcopy(solution_data))
     # sct_range is irrelevant in charts
     s = setup_state(user_data, solution_data, "A1")
     with verify_success(correct):
-        has_equal_charts(s)
+        has_equal_chart(s)
