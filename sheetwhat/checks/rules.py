@@ -20,14 +20,24 @@ def safe_glom(obj, path, fallback=None):
 
 
 class Rule:
-    def __init__(self, student_structure, solution_structure, issues):
+    def __init__(
+        self, student_structure, solution_structure, issues, should_check=None
+    ):
         self.student_structure = student_structure
         self.solution_structure = solution_structure
         self.issues = issues
+        if callable(should_check):
+            self.should_check = should_check
+        else:
+            self.should_check = lambda x: True
+
+    def __call__(self, *args, tag=None, **kwargs):
+        if self.should_check(tag):
+            self.call(*args, **kwargs)
 
 
 class ArrayEqualityRule(Rule):
-    def __call__(self, path, message, equal_func=lambda x, y: x == y):
+    def call(self, path, message, equal_func=lambda x, y: x == y):
         solution_array = safe_glom(self.solution_structure, path)
         student_array = safe_glom(self.student_structure, path)
         if not isinstance(student_array, list):
@@ -54,7 +64,7 @@ class ArrayEqualityRule(Rule):
 
 
 class ArrayEqualLengthRule(Rule):
-    def __call__(self, path, message):
+    def call(self, path, message):
         solution_array = safe_glom(self.solution_structure, path)
         student_array = safe_glom(self.student_structure, path)
         if not isinstance(student_array, list):
@@ -70,7 +80,7 @@ class ArrayEqualLengthRule(Rule):
 
 
 class DictKeyEqualityRule(Rule):
-    def __call__(self, path, message):
+    def call(self, path, message):
         solution_dict = safe_glom(self.solution_structure, path)
         student_dict = safe_glom(self.student_structure, path)
         if not isinstance(student_dict, dict) or not isinstance(solution_dict, dict):
@@ -86,7 +96,7 @@ class DictKeyEqualityRule(Rule):
 
 
 class EqualityRule(Rule):
-    def __call__(self, path, message):
+    def call(self, path, message):
         solution_field = safe_glom(self.solution_structure, path)
         student_field = safe_glom(self.student_structure, path)
         if solution_field != student_field:
@@ -96,7 +106,7 @@ class EqualityRule(Rule):
 
 
 class ExistenceRule(Rule):
-    def __call__(self, path, message):
+    def call(self, path, message):
         if not is_empty(safe_glom(self.solution_structure, path)) and is_empty(
             safe_glom(self.student_structure, path)
         ):
@@ -104,7 +114,7 @@ class ExistenceRule(Rule):
 
 
 class OverExistenceRule(Rule):
-    def __call__(self, path, message):
+    def call(self, path, message):
         if is_empty(safe_glom(self.solution_structure, path)) and not is_empty(
             safe_glom(self.student_structure, path)
         ):
@@ -112,7 +122,7 @@ class OverExistenceRule(Rule):
 
 
 class SetEqualityRule(Rule):
-    def __call__(self, path, message):
+    def call(self, path, message):
         solution_array = safe_glom(self.solution_structure, path)
         student_array = safe_glom(self.student_structure, path)
         if not isinstance(student_array, list) or not isinstance(solution_array, list):
