@@ -1,7 +1,7 @@
 import pytest
 
 from sheetwhat.utils import (
-    letters_to_numbers,
+    letters_to_number,
     range_to_row_columns,
     crop_by_range,
     is_empty,
@@ -28,8 +28,8 @@ from sheetwhat.utils import (
         ("auz", 1247),
     ],
 )
-def test_letters_to_numbers(letters, number):
-    assert letters_to_numbers(letters) == number
+def test_letters_to_number(letters, number):
+    assert letters_to_number(letters) == number
 
 
 @pytest.mark.parametrize(

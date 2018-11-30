@@ -9,11 +9,11 @@ def range_to_row_columns(range_spec):
 
     row_columns = {
         "start_row": int(groups.group(2)) - 1,
-        "start_column": letters_to_numbers(groups.group(1)),
+        "start_column": letters_to_number(groups.group(1)),
     }
 
     if groups.group(3) is not None:
-        row_columns["end_column"] = letters_to_numbers(groups.group(3)) + 1
+        row_columns["end_column"] = letters_to_number(groups.group(3)) + 1
     else:
         row_columns["end_column"] = row_columns["start_column"] + 1
 
@@ -25,11 +25,23 @@ def range_to_row_columns(range_spec):
     return row_columns
 
 
+def row_columns_to_range(row_columns):
+    start_row_index = row_columns["start_row"]
+    start_column_index = row_columns["start_column"]
+    end_row_index = row_columns.get("end_row", start_row_index + 1)
+    end_column_index = row_columns.get("end_column", start_column_index + 1)
+    start = f"{number_to_letters(start_column_index)}{start_row_index+ 1}"
+    end = f"{number_to_letters(end_column_index - 1)}{end_row_index}"
+    if start == end:
+        return start
+    return f"{start}:{end}"
+
+
 BASE = 26
 NUMBER_OF_FIRST = ord("A")
 
 
-def letters_to_numbers(letters):
+def letters_to_number(letters):
     letters_normalized = letters.upper()
     letters_length = len(letters_normalized)
     return (
@@ -42,6 +54,20 @@ def letters_to_numbers(letters):
         )
         - 1
     )
+
+
+def number_to_letters(number):
+    zero_index_number = number + 1
+    letters = ""
+    x = 1
+    y = 26
+    zero_index_number = zero_index_number - x
+    while zero_index_number >= 0:
+        letters = chr(int((zero_index_number % y) / x) + ord("A")) + letters
+        x = y
+        y = y * 26
+        zero_index_number = zero_index_number - x
+    return letters
 
 
 def crop_by_range(array_2d, range_spec):
