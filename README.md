@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/datacamp/sheetwhat.svg?branch=master)](https://travis-ci.org/datacamp/sheetwhat)
 [![codecov](https://codecov.io/gh/datacamp/sheetwhat/branch/master/graph/badge.svg)](https://codecov.io/gh/datacamp/sheetwhat)
 [![PyPI version](https://badge.fury.io/py/sheetwhat.svg)](https://badge.fury.io/py/sheetwhat)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdatacamp%2Fsheetwhat.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdatacamp%2Fsheetwhat?ref=badge_shield)
 
 `sheetwhat` enables you to write Submission Correctness Tests (SCTs) for interactive Spreadsheet exercises on DataCamp.
 
@@ -51,3 +52,7 @@ pip install -r requirements.txt
 pip install -e .
 pytest
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdatacamp%2Fsheetwhat.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdatacamp%2Fsheetwhat?ref=badge_large)
