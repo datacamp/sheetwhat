@@ -96,10 +96,10 @@ class DictKeyEqualityRule(Rule):
 
 
 class EqualityRule(Rule):
-    def call(self, path, message):
+    def call(self, path, message, equal_func=lambda x, y: x == y):
         solution_field = safe_glom(self.solution_structure, path)
         student_field = safe_glom(self.student_structure, path)
-        if solution_field != student_field:
+        if not equal_func(solution_field, student_field):
             self.issues.append(
                 message.format(expected=solution_field, actual=student_field)
             )

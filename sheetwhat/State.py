@@ -8,16 +8,21 @@ class State(BaseState):
         self.solution_data = solution_data
         self.sct_range = sct_range
         self.reporter = reporter
+        self.node_name = "root"
+        self.prepend_msg = ""
 
     def do_test(self, feedback_message, highlight=None):
         return self.reporter.do_test(feedback_message)
 
-    def to_child(self, student_data, solution_data):
+    def to_child(self, student_data, solution_data, prepend_msg="", node_name=None):
         """Basic implementation of returning a child state"""
 
+        # TODO: needs to be deepcopy
         child = copy.copy(self)
         child.student_data = student_data
         child.solution_data = solution_data
+        child.prepend_msg = self.prepend_msg + prepend_msg
+        child.node_name = node_name
         child.parent = self
         return child
 
