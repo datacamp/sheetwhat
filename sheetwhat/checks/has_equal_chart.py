@@ -60,6 +60,52 @@ def create_should_check(skip, only):
         return lambda x: True
 
 
+def check_chart(state, extra_msg=None):
+    solution_chart = find_chart(state.solution_data["charts"], state.sct_range)
+    if len(state.student_data["charts"]) == 0:
+        state.do_test(f"Please create a chart near `{state.sct_range}`.")
+    student_chart = find_chart(state.student_data["charts"], state.sct_range)
+    student_chart_range = row_columns_to_range(find_chart_range(student_chart))
+
+    # Figure out chart type
+    solution_chart_type = infer_chart_type(solution_chart)
+
+    if safe_glom(student_chart, f"spec.{solution_chart_type}") is None:
+        state.do_test(
+            f"The chart type of the chart at `{student_chart_range}` is not correct."
+        )
+
+    return state.to_child(
+        student_data=student_chart["spec"],
+        solution_data=solution_chart["spec"],
+        # TODO: how to do messaging better?
+        prepend_msg=f"In the chart at `{student_chart_range}`",
+        node_name=solution_chart_type,
+    )
+
+def has_equal_title(state):
+    domain_path = {"basicChart": "domains.0.domain.sourceRange.sources.0"}
+    if state.node_name in domain_path.keys():
+        full_domain_path = f"{state.node_name}.{domain_path[state.node_name]}"
+        solution_domain = safe_glom(state.solution_data, full_domain_path)
+        student_domain = safe_glom(state.student_data, full_domain_path)
+        if not student_domain == solution_domain:
+            state.do_test(f"{state.prepend_msg}, the X-axis is incorrect")
+    else:
+        return state
+
+def has_equal_domain(state):
+    domain_path = {"basicChart": "domains.0.domain.sourceRange.sources.0"}
+    if state.node_name in domain_path.keys():
+        full_domain_path = f"{state.node_name}.{domain_path[state.node_name]}"
+        solution_domain = safe_glom(state.solution_data, full_domain_path)
+        student_domain = safe_glom(state.student_data, full_domain_path)
+        if not student_domain == solution_domain:
+            state.do_test(f"{state.prepend_msg}, the X-axis is incorrect")
+    else:
+        return state
+
+
 def has_equal_chart(state, skip=None, only=None, extra_msg=None):
     should_check = create_should_check(skip, only)
     solution_chart = find_chart(state.solution_data["charts"], state.sct_range)
@@ -94,7 +140,12 @@ def has_equal_chart(state, skip=None, only=None, extra_msg=None):
 
     if len(issues) == 0:
         bound_rules["equality"](
-            f"spec.{solution_chart_type}.domains", "The X-axis is not correct."
+            (
+                f"spec.{solution_chart_type}.domains",
+                ["domain.sourceRange.sources"],
+                "0",
+            ),
+            "The X-axis is incorrect.",
         )
 
         bound_rules["array_equal_length"](

@@ -4,6 +4,7 @@ import json
 
 
 from sheetwhat.State import State
+from sheetwhat.sct_syntax import SCT_CTX
 from protowhat.Reporter import Reporter
 from protowhat.Test import TestFail as TF
 
@@ -14,6 +15,11 @@ from contextlib import contextmanager
 
 def setup_state(stu, sol, sct_range):
     return State(stu, sol, sct_range, reporter=Reporter())
+
+
+def setup_ex_state(stu, sol, sct_range):
+    Ex = SCT_CTX["Ex"]
+    return Ex(State(stu, sol, sct_range, reporter=Reporter()))
 
 
 @contextmanager

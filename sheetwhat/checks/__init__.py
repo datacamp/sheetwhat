@@ -8,7 +8,11 @@ from sheetwhat.checks.check_funcs import (
     check_operator,
 )
 from sheetwhat.checks.has_equal_pivot import has_equal_pivot
-from sheetwhat.checks.has_equal_chart import has_equal_chart
+from sheetwhat.checks.has_equal_chart import (
+    has_equal_chart,
+    check_chart,
+    has_equal_domain,
+)
 from sheetwhat.checks.has_equal_conditional_formats import has_equal_conditional_formats
 
 # don't import some funcs from protowhat that don't make sense:

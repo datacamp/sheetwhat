@@ -4,13 +4,14 @@ from tests.helper import (
     Identity,
     Mutation,
     setup_state,
+    setup_ex_state,
     verify_success,
     compose,
     Deletion,
     Addition,
 )
 
-from sheetwhat.checks import has_equal_chart
+from sheetwhat.checks import has_equal_chart, check_chart, has_equal_domain
 
 # Fixtures
 @pytest.fixture()
@@ -37,6 +38,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 0,
@@ -53,6 +55,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 1,
@@ -68,6 +71,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 2,
@@ -83,6 +87,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 3,
@@ -98,6 +103,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 4,
@@ -138,6 +144,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 0,
@@ -154,6 +161,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 1,
@@ -169,6 +177,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 2,
@@ -184,6 +193,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 3,
@@ -199,6 +209,7 @@ def charts():
                                 "sourceRange": {
                                     "sources": [
                                         {
+                                            "sheetId": "Sheet1",
                                             "startRowIndex": 0,
                                             "endRowIndex": 8,
                                             "startColumnIndex": 4,
@@ -249,7 +260,7 @@ def solution_data(charts):
         (
             Mutation(["charts", 0, "spec", "title"], "Other title"),
             False,
-            "close to `E1`",
+            "close to `G1`",
         ),
         (Deletion(["charts", 0, "spec", "title"]), False, "1 issue"),
         (Mutation(["charts", 0, "spec", "subTitle"], "something"), False, "1 issue"),
@@ -349,7 +360,7 @@ def test_has_equal_chart(solution_data, trans, correct, match):
                             "sourceRange": {
                                 "sources": [
                                     {
-                                        "sheetId": 1964080503,
+                                        "sheetId": "Sheet1",
                                         "startRowIndex": 0,
                                         "endRowIndex": 4,
                                         "startColumnIndex": 0,
@@ -387,7 +398,7 @@ def test_has_equal_chart_trans_on_solution(solution_data, trans, correct):
                             "sourceRange": {
                                 "sources": [
                                     {
-                                        "sheetId": 1964080503,
+                                        "sheetId": "Sheet1",
                                         "startRowIndex": 0,
                                         "endRowIndex": 4,
                                         "startColumnIndex": 0,
@@ -409,3 +420,119 @@ def test_has_equal_chart_trans_on_other_chart(solution_data, trans, correct):
     s = setup_state(user_data, solution_data, "A1")
     with verify_success(correct):
         has_equal_chart(s)
+
+
+@pytest.mark.debug
+@pytest.mark.parametrize(
+    "trans, correct, match, do_sct",
+    [
+        (Identity(), True, None, lambda x: x.check_chart()),
+        (Identity(), True, None, lambda x: x.check_chart().has_equal_domain()),
+        (
+            Mutation(
+                ["charts", 0, "spec", "basicChart"],
+                {
+                    "domain": {
+                        "sourceRange": {
+                            "sources": [
+                                {
+                                    "sheetId": "Sheet1",
+                                    "startRowIndex": 0,
+                                    "endRowIndex": 4,
+                                    "startColumnIndex": 0,
+                                    "endColumnIndex": 1,
+                                }
+                            ]
+                        }
+                    }
+                },
+            ),
+            False,
+            "the X-axis is incorrect",
+            lambda x: x.check_chart().has_equal_domain(),
+        ),
+        (
+            Mutation(
+                ["charts", 0, "spec", "basicChart"],
+                {
+                    "domain": {
+                        "sourceRange": {
+                            "sources": [
+                                {
+                                    "sheetId": "Sheet1",
+                                    "startRowIndex": 0,
+                                    "endRowIndex": 4,
+                                    "startColumnIndex": 0,
+                                    "endColumnIndex": 1,
+                                }
+                            ]
+                        }
+                    }
+                },
+            ),
+            True,
+            None,
+            lambda x: x.check_chart(),
+        ),
+        (
+            compose(
+                Deletion(["charts", 0, "spec", "basicChart"]),
+                Mutation(
+                    ["charts", 0, "spec", "pieChart"],
+                    {
+                        "domain": {
+                            "sourceRange": {
+                                "sources": [
+                                    {
+                                        "sheetId": "Sheet1",
+                                        "startRowIndex": 0,
+                                        "endRowIndex": 4,
+                                        "startColumnIndex": 0,
+                                        "endColumnIndex": 1,
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                ),
+            ),
+            False,
+            "chart type",
+            lambda x: x.check_chart().has_equal_domain(),
+        ),
+        (
+            compose(
+                Deletion(["charts", 0, "spec", "basicChart"]),
+                Mutation(
+                    ["charts", 0, "spec", "pieChart"],
+                    {
+                        "domain": {
+                            "sourceRange": {
+                                "sources": [
+                                    {
+                                        "sheetId": "Sheet1",
+                                        "startRowIndex": 0,
+                                        "endRowIndex": 4,
+                                        "startColumnIndex": 0,
+                                        "endColumnIndex": 1,
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                ),
+            ),
+            False,
+            "chart type",
+            lambda x: x.check_chart(),
+        ),
+    ],
+)
+def test_check_chart(solution_data, trans, correct, match, do_sct):
+    solution_data = deepcopy(solution_data)
+    student_data = trans(deepcopy(solution_data))
+
+    s = setup_ex_state(student_data, solution_data, "E1")
+    with verify_success(correct, match=match):
+        do_sct(s)
+
