@@ -68,10 +68,11 @@ def check_chart(state, extra_msg=None):
         if student_chart_type != detailed_solution_chart_type:
             state.do_test(chart_type_msg)
 
+    state.set_root_message(f"in the chart at `{student_chart_range}`")
+
     return state.to_child(
         student_data=student_chart["spec"],
         solution_data=solution_chart["spec"],
-        prepend_msg=f"In the chart at `{student_chart_range}`",
         node_name=solution_chart_type,
     )
 

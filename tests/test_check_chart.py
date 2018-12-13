@@ -372,7 +372,7 @@ def test_has_equal_domain(solution_data, trans, correct, match):
                 },
             ),
             False,
-            None,
+            "In the chart at .*, the first series is not correct",
         ),
         (
             Mutation(
