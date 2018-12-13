@@ -3,6 +3,8 @@ import functools
 from sheetwhat.utils import is_empty, dict_keys, normalize_formula
 from protowhat import selectors
 
+from ..utils import lower_first
+
 # Supercharge path with appropriate coalesce at every level
 # E.g.
 #  deep_coalesce("path", None) => Coalesce("path", default=None)
@@ -20,20 +22,13 @@ def safe_glom(obj, path, fallback=None):
 
 
 class Rule:
-    def __init__(
-        self, student_structure, solution_structure, issues, should_check=None
-    ):
+    def __init__(self, student_structure, solution_structure, issues):
         self.student_structure = student_structure
         self.solution_structure = solution_structure
         self.issues = issues
-        if callable(should_check):
-            self.should_check = should_check
-        else:
-            self.should_check = lambda x: True
 
     def __call__(self, *args, tag=None, **kwargs):
-        if self.should_check(tag):
-            self.call(*args, **kwargs)
+        self.call(*args, **kwargs)
 
 
 class ArrayEqualityRule(Rule):
@@ -142,3 +137,21 @@ rule_types = {
     "over_existence": OverExistenceRule,
     "set_equality": SetEqualityRule,
 }
+
+
+def with_rules(func):
+    @functools.wraps(func)
+    def wrapper_with_rules(state, *args, **kwargs):
+        issues = []
+        bound_rules = {
+            key: RuleClass(state.student_data, state.solution_data, issues)
+            for key, RuleClass in rule_types.items()
+        }
+        result = func(state, *args, rules=bound_rules, **kwargs)
+        nb_issues = len(issues)
+        if nb_issues > 0:
+            first_msg = lower_first(issues[0])
+            state.do_test(f"{state.prepend_msg}, {first_msg}.")
+        return result
+
+    return wrapper_with_rules
