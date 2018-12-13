@@ -3,11 +3,14 @@ import pytest
 from sheetwhat.utils import (
     letters_to_number,
     range_to_row_columns,
+    row_columns_to_range,
     crop_by_range,
     is_empty,
     normalize_array_2d,
     map_2d,
     dict_keys,
+    lower_first,
+    upper_first,
 )
 
 
@@ -49,6 +52,15 @@ def test_range_to_row_columns(range_spec, start_row, start_column, end_row, end_
         "end_row": end_row,
         "end_column": end_column,
     }
+
+
+@pytest.mark.parametrize(
+    "range_spec",
+    ["A1", "AA1", "A123", "AA11", "AZAAASDAFAAZ112412412", "A1:B5", "ZZ1241:ZZZ232352"],
+)
+def test_row_columns_to_range(range_spec):
+    # They should always be each other's inverse
+    assert range_spec == row_columns_to_range(range_to_row_columns(range_spec))
 
 
 @pytest.mark.parametrize(
@@ -130,3 +142,31 @@ def test_map_2d(array_2d, func, target):
 )
 def test_dict_keys(dicts, result):
     assert dict_keys(*dicts) == result
+
+
+@pytest.mark.parametrize(
+    "text, result",
+    [
+        ("Test", "test"),
+        ("teSt", "teSt"),
+        ("this is a longer sentence", "this is a longer sentence"),
+        ("This is a longer sentence", "this is a longer sentence"),
+        ("This is a Longer sentence", "this is a Longer sentence"),
+    ],
+)
+def test_lower_first(text, result):
+    assert lower_first(text) == result
+
+
+@pytest.mark.parametrize(
+    "text, result",
+    [
+        ("Test", "Test"),
+        ("teSt", "TeSt"),
+        ("this is a longer sentence", "This is a longer sentence"),
+        ("This is a longer sentence", "This is a longer sentence"),
+        ("This is a Longer sentence", "This is a Longer sentence"),
+    ],
+)
+def test_upper_first(text, result):
+    assert upper_first(text) == result

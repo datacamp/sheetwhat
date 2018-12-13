@@ -117,3 +117,11 @@ def dict_keys(*dicts):
         if isinstance(dict_i, dict):
             key_set = key_set | set(dict_i)
     return key_set
+
+
+def lower_first(text):
+    return text[0].lower() + text[1:]
+
+
+def upper_first(text):
+    return text[0].upper() + text[1:]

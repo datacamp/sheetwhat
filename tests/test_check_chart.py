@@ -11,7 +11,7 @@ from tests.helper import (
     Addition,
 )
 
-from sheetwhat.checks import has_equal_chart, check_chart, has_equal_domain
+from sheetwhat.checks import check_chart
 
 # Fixtures
 @pytest.fixture()
@@ -246,6 +246,8 @@ def solution_data(charts):
 
 
 # Tests
+
+## check_chart
 @pytest.mark.parametrize(
     "trans, correct, match",
     [
@@ -254,17 +256,60 @@ def solution_data(charts):
         (
             Mutation(["charts", 0, "spec", "basicChart", "chartType"], "LINE"),
             False,
-            "The chart type is not correct.",
+            "The chart type .* is not correct",
         ),
+        (Mutation(["charts", 0, "spec", "title"], "Other title"), True, None),
+        (Mutation(["charts", 0, "spec", "subtitle"], "Other title"), True, None),
+    ],
+)
+def test_check_chart(solution_data, trans, correct, match):
+    solution_data = deepcopy(solution_data)
+    student_data = trans(deepcopy(solution_data))
+
+    s = setup_ex_state(student_data, solution_data, "E1")
+    with verify_success(correct, match=match):
+        s.check_chart()
+
+
+## has_equal_title
+@pytest.mark.parametrize(
+    "trans, correct, match",
+    [
+        (Identity(), True, None),
         (Mutation(["charts", 0, "spec", "title"], "Other title"), False, None),
+        (Mutation(["charts", 0, "spec", "subtitle"], "Other title"), False, None),
         (
             Mutation(["charts", 0, "spec", "title"], "Other title"),
             False,
-            "close to `G1`",
+            "title .* not correct",
         ),
-        (Deletion(["charts", 0, "spec", "title"]), False, "1 issue"),
-        (Mutation(["charts", 0, "spec", "subTitle"], "something"), False, "1 issue"),
-        (Deletion(["charts", 0, "spec", "basicChart", "domains", 0]), False, "1 issue"),
+        (Deletion(["charts", 0, "spec", "title"]), False, "title .* not correct"),
+        (
+            Mutation(["charts", 0, "spec", "subtitle"], "test"),
+            False,
+            "subtitle .* not correct",
+        ),
+    ],
+)
+def test_has_equal_title(solution_data, trans, correct, match):
+    solution_data = deepcopy(solution_data)
+    student_data = trans(deepcopy(solution_data))
+
+    s = setup_ex_state(student_data, solution_data, "E1")
+    with verify_success(correct, match=match):
+        s.check_chart().has_equal_title()
+
+
+## has_equal_domain
+@pytest.mark.parametrize(
+    "trans, correct, match",
+    [
+        (Identity(), True, None),
+        (
+            Deletion(["charts", 0, "spec", "basicChart", "domains", 0]),
+            False,
+            "X-axis .* not correct",
+        ),
         (
             Mutation(
                 [
@@ -289,6 +334,22 @@ def solution_data(charts):
             False,
             "X-axis",
         ),
+    ],
+)
+def test_has_equal_domain(solution_data, trans, correct, match):
+    solution_data = deepcopy(solution_data)
+    student_data = trans(deepcopy(solution_data))
+
+    s = setup_ex_state(student_data, solution_data, "E1")
+    with verify_success(correct, match=match):
+        s.check_chart().has_equal_domain()
+
+
+## has_equal_series
+@pytest.mark.parametrize(
+    "trans, correct, match",
+    [
+        (Identity(), True, None),
         (Deletion(["charts", 0, "spec", "basicChart", "series", 0]), False, None),
         (
             Addition(
@@ -339,12 +400,13 @@ def solution_data(charts):
         ),
     ],
 )
-def test_has_equal_chart(solution_data, trans, correct, match):
-    user_data = trans(deepcopy(solution_data))
-    # sct_range is irrelevant in charts
-    s = setup_state(user_data, solution_data, "E1")
+def test_has_equal_series(solution_data, trans, correct, match):
+    solution_data = deepcopy(solution_data)
+    student_data = trans(deepcopy(solution_data))
+
+    s = setup_ex_state(student_data, solution_data, "E1")
     with verify_success(correct, match=match):
-        has_equal_chart(s)
+        s.check_chart().has_equal_series()
 
 
 @pytest.mark.parametrize(
@@ -379,9 +441,9 @@ def test_has_equal_chart(solution_data, trans, correct, match):
 def test_has_equal_chart_trans_on_solution(solution_data, trans, correct):
     user_data = deepcopy(solution_data)
     solution_data = trans(deepcopy(solution_data))
-    s = setup_state(user_data, solution_data, "E1")
+    s = setup_ex_state(user_data, solution_data, "E1")
     with verify_success(correct):
-        has_equal_chart(s)
+        s.check_chart()
 
 
 @pytest.mark.parametrize(
@@ -417,122 +479,6 @@ def test_has_equal_chart_trans_on_solution(solution_data, trans, correct):
 def test_has_equal_chart_trans_on_other_chart(solution_data, trans, correct):
     user_data = deepcopy(solution_data)
     solution_data = trans(deepcopy(solution_data))
-    s = setup_state(user_data, solution_data, "A1")
+    s = setup_ex_state(user_data, solution_data, "A1")
     with verify_success(correct):
-        has_equal_chart(s)
-
-
-@pytest.mark.debug
-@pytest.mark.parametrize(
-    "trans, correct, match, do_sct",
-    [
-        (Identity(), True, None, lambda x: x.check_chart()),
-        (Identity(), True, None, lambda x: x.check_chart().has_equal_domain()),
-        (
-            Mutation(
-                ["charts", 0, "spec", "basicChart"],
-                {
-                    "domain": {
-                        "sourceRange": {
-                            "sources": [
-                                {
-                                    "sheetId": "Sheet1",
-                                    "startRowIndex": 0,
-                                    "endRowIndex": 4,
-                                    "startColumnIndex": 0,
-                                    "endColumnIndex": 1,
-                                }
-                            ]
-                        }
-                    }
-                },
-            ),
-            False,
-            "the X-axis is incorrect",
-            lambda x: x.check_chart().has_equal_domain(),
-        ),
-        (
-            Mutation(
-                ["charts", 0, "spec", "basicChart"],
-                {
-                    "domain": {
-                        "sourceRange": {
-                            "sources": [
-                                {
-                                    "sheetId": "Sheet1",
-                                    "startRowIndex": 0,
-                                    "endRowIndex": 4,
-                                    "startColumnIndex": 0,
-                                    "endColumnIndex": 1,
-                                }
-                            ]
-                        }
-                    }
-                },
-            ),
-            True,
-            None,
-            lambda x: x.check_chart(),
-        ),
-        (
-            compose(
-                Deletion(["charts", 0, "spec", "basicChart"]),
-                Mutation(
-                    ["charts", 0, "spec", "pieChart"],
-                    {
-                        "domain": {
-                            "sourceRange": {
-                                "sources": [
-                                    {
-                                        "sheetId": "Sheet1",
-                                        "startRowIndex": 0,
-                                        "endRowIndex": 4,
-                                        "startColumnIndex": 0,
-                                        "endColumnIndex": 1,
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                ),
-            ),
-            False,
-            "chart type",
-            lambda x: x.check_chart().has_equal_domain(),
-        ),
-        (
-            compose(
-                Deletion(["charts", 0, "spec", "basicChart"]),
-                Mutation(
-                    ["charts", 0, "spec", "pieChart"],
-                    {
-                        "domain": {
-                            "sourceRange": {
-                                "sources": [
-                                    {
-                                        "sheetId": "Sheet1",
-                                        "startRowIndex": 0,
-                                        "endRowIndex": 4,
-                                        "startColumnIndex": 0,
-                                        "endColumnIndex": 1,
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                ),
-            ),
-            False,
-            "chart type",
-            lambda x: x.check_chart(),
-        ),
-    ],
-)
-def test_check_chart(solution_data, trans, correct, match, do_sct):
-    solution_data = deepcopy(solution_data)
-    student_data = trans(deepcopy(solution_data))
-
-    s = setup_ex_state(student_data, solution_data, "E1")
-    with verify_success(correct, match=match):
-        do_sct(s)
-
+        s.check_chart()
