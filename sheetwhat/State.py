@@ -15,12 +15,14 @@ class State(BaseState):
         assert isinstance(message, str)
         self.root_message = message
 
-    def do_test(self, message_or_issues):
+    def do_test(self, message_or_issues, *args, **kwargs):
         is_list = isinstance(message_or_issues, list)
         is_str = isinstance(message_or_issues, str)
         assert is_list or is_str
         if is_list:
-            return self.reporter.do_test(self.root_message, message_or_issues)
+            return self.reporter.do_test(
+                self.root_message, message_or_issues, *args, **kwargs
+            )
         if is_str:
             return self.reporter.do_test(message_or_issues)
 
