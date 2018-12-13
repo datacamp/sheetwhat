@@ -17,8 +17,7 @@ class State(BaseState):
     def to_child(self, student_data, solution_data, prepend_msg="", node_name=None):
         """Basic implementation of returning a child state"""
 
-        # TODO: needs to be deepcopy
-        child = copy.copy(self)
+        child = copy.deepcopy(self)
         child.student_data = student_data
         child.solution_data = solution_data
         child.prepend_msg = self.prepend_msg + prepend_msg
