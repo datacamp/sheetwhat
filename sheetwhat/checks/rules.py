@@ -150,8 +150,7 @@ def with_rules(func):
         result = func(state, *args, rules=bound_rules, **kwargs)
         nb_issues = len(issues)
         if nb_issues > 0:
-            first_msg = lower_first(issues[0])
-            state.do_test(f"{state.prepend_msg}, {first_msg}.")
+            state.do_test(issues)
         return result
 
     return wrapper_with_rules

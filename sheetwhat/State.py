@@ -9,18 +9,26 @@ class State(BaseState):
         self.sct_range = sct_range
         self.reporter = reporter
         self.node_name = "root"
-        self.prepend_msg = ""
+        self.root_message = ""
 
-    def do_test(self, feedback_message, highlight=None):
-        return self.reporter.do_test(feedback_message)
+    def set_root_message(self, message):
+        assert isinstance(message, str)
+        self.root_message = message
 
-    def to_child(self, student_data, solution_data, prepend_msg="", node_name=None):
+    def do_test(self, message_or_issues):
+        is_list = isinstance(message_or_issues, list)
+        is_str = isinstance(message_or_issues, str)
+        assert is_list or is_str
+        if is_list:
+            return self.reporter.do_test(self.root_message, message_or_issues)
+        if is_str:
+            return self.reporter.do_test(message_or_issues)
+
+    def to_child(self, student_data, solution_data, node_name=None):
         """Basic implementation of returning a child state"""
-
         child = copy.deepcopy(self)
         child.student_data = student_data
         child.solution_data = solution_data
-        child.prepend_msg = self.prepend_msg + prepend_msg
         child.node_name = node_name
         child.parent = self
         return child
