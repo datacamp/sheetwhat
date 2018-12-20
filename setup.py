@@ -9,7 +9,7 @@ PACKAGE_NAME = "sheetwhat"
 REQUIREMENT_NAMES = ["protowhat", "glom"]
 
 HERE = path.abspath(path.dirname(__file__))
-VERSION_FILE = path.join(HERE, "src", PACKAGE_NAME, "__init__.py")
+VERSION_FILE = path.join(HERE, PACKAGE_NAME, "__init__.py")
 REQUIREMENTS_FILE = path.join(HERE, "requirements.txt")
 README_FILE = path.join(HERE, "README.md")
 
