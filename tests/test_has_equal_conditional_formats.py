@@ -1,6 +1,6 @@
 import pytest
 from copy import deepcopy
-from tests.helper import Identity, Mutation, setup_state, verify_success
+from tests.helper import Deletion, Identity, Mutation, setup_state, verify_success
 
 from sheetwhat.checks import has_equal_conditional_formats
 
@@ -144,6 +144,18 @@ def test_has_equal_conditional_formats(solution_data, trans, correct, match):
     ],
 )
 def test_has_equal_conditional_formats_2(solution_data_2, trans, correct, match):
+    user_data = trans(deepcopy(solution_data_2))
+    # sct_range is irrelevant in conditional formats
+    s = setup_state(user_data, solution_data_2, "A1")
+    with verify_success(correct, match=match):
+        has_equal_conditional_formats(s)
+
+
+@pytest.mark.parametrize(
+    "trans, correct, match",
+    [(Deletion(["conditionalFormats", 1]), False, "enough conditional format rules")],
+)
+def test_has_equal_conditional_formats_3(solution_data_2, trans, correct, match):
     user_data = trans(deepcopy(solution_data_2))
     # sct_range is irrelevant in conditional formats
     s = setup_state(user_data, solution_data_2, "A1")
