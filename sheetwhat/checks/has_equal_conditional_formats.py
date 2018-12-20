@@ -8,6 +8,9 @@ def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
 
     issues = []
 
+    if len(student_cond_formats) < len(solution_cond_formats):
+        state.do_test("There aren't enough conditional format rules.")
+
     for i, (student_cond_format, solution_cond_format) in enumerate(
         zip(student_cond_formats, solution_cond_formats)
     ):
