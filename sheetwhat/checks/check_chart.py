@@ -19,7 +19,7 @@ def infer_chart_type(chart):
             return chart_type
 
 
-def find_chart_range(chart):
+def find_chart_anchor(chart):
     raw_row_columns = safe_glom(chart, "position.overlayPosition.anchorCell")
     return {
         "start_row": safe_glom(raw_row_columns, "rowIndex", 0),
@@ -28,7 +28,7 @@ def find_chart_range(chart):
 
 
 def manhatten_distance_to_chart(chart, sct_range):
-    anchor_cell = find_chart_range(chart)
+    anchor_cell = find_chart_anchor(chart)
     x = anchor_cell["start_column"]
     y = anchor_cell["start_row"]
     sct_range_as_row_columns = range_to_row_columns(sct_range)
@@ -51,12 +51,12 @@ def check_chart(state, extra_msg=None):
     if len(state.student_data["charts"]) == 0:
         state.do_test(f"Please create a chart near `{state.sct_range}`.")
     student_chart = find_chart(state.student_data["charts"], state.sct_range)
-    student_chart_range = row_columns_to_range(find_chart_range(student_chart))
+    student_chart_anchor = row_columns_to_range(find_chart_anchor(student_chart))
 
     solution_chart_type = infer_chart_type(solution_chart)
 
     chart_type_msg = (
-        f"The chart type of the chart at `{student_chart_range}` is not correct."
+        f"The chart type of the chart at `{student_chart_anchor}` is not correct."
     )
 
     if safe_glom(student_chart, f"spec.{solution_chart_type}") is None:
@@ -68,7 +68,7 @@ def check_chart(state, extra_msg=None):
         if student_chart_type != detailed_solution_chart_type:
             state.do_test(chart_type_msg)
 
-    state.set_root_message(f"in the chart at `{student_chart_range}`")
+    state.set_root_message(f"in the chart at `{student_chart_anchor}`")
 
     return state.to_child(
         student_data=student_chart["spec"],
