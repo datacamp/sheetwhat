@@ -1,6 +1,13 @@
 import pytest
 from copy import deepcopy
-from tests.helper import Deletion, Identity, Mutation, setup_state, verify_success
+from tests.helper import (
+    Deletion,
+    Identity,
+    Mutation,
+    setup_state,
+    setup_ex_state,
+    verify_success,
+)
 
 from sheetwhat.checks import has_equal_conditional_formats
 
@@ -12,10 +19,11 @@ def conditional_format():
             "ranges": [
                 {
                     "sheetId": "Sheet1",
-                    "endRowIndex": 12,
-                    "startRowIndex": 2,
-                    "endColumnIndex": 8,
-                    "startColumnIndex": 5,
+                    # A1:C4
+                    "endRowIndex": 4,
+                    "startRowIndex": 0,
+                    "endColumnIndex": 3,
+                    "startColumnIndex": 0,
                 }
             ],
             "booleanRule": {
@@ -161,3 +169,21 @@ def test_has_equal_conditional_formats_3(solution_data_2, trans, correct, match)
     s = setup_state(user_data, solution_data_2, "A1")
     with verify_success(correct, match=match):
         has_equal_conditional_formats(s)
+
+
+@pytest.mark.debug
+def test_has_equal_conditional_formats_fail(solution_data):
+    user_data = deepcopy(solution_data)
+    user_data["conditionalFormats"][0]["ranges"] = [
+        {
+            "sheetId": "Sheet1",
+            # A1:C5
+            "endRowIndex": 5,
+            "startRowIndex": 0,
+            "endColumnIndex": 3,
+            "startColumnIndex": 0,
+        }
+    ]
+    Ex = setup_ex_state(user_data, solution_data, "A1")
+    with verify_success(True):
+        Ex.has_equal_conditional_formats()
