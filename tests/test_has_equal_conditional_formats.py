@@ -195,3 +195,11 @@ def test_has_equal_conditional_formats_fail(solution_data):
     Ex = setup_ex_state(user_data, solution_data, "A1")
     with verify_success(True):
         Ex.has_equal_conditional_formats()
+
+
+def test_has_equal_conditional_formats_out_of_range(solution_data):
+    user_data = deepcopy(solution_data)
+    user_data["conditionalFormats"][0]["booleanRule"] = {}
+    Ex = setup_ex_state(user_data, solution_data, "Z1")
+    with verify_success(True):
+        Ex.has_equal_conditional_formats()
