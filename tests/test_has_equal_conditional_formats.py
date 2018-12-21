@@ -1,6 +1,8 @@
 import pytest
 from copy import deepcopy
 from tests.helper import (
+    compose,
+    Addition,
     Deletion,
     Identity,
     Mutation,
@@ -51,10 +53,11 @@ def conditional_format_2(conditional_format):
             "ranges": [
                 {
                     "sheetId": "Sheet1",
-                    "endRowIndex": 12,
-                    "startRowIndex": 2,
-                    "endColumnIndex": 8,
-                    "startColumnIndex": 5,
+                    # A1:C4
+                    "endRowIndex": 4,
+                    "startRowIndex": 0,
+                    "endColumnIndex": 3,
+                    "startColumnIndex": 0,
                 }
             ],
             "gradientRule": {
@@ -119,7 +122,10 @@ def solution_data_2(conditional_format_2):
             "format of the first rule is incorrect",
         ),
         (
-            Mutation(["conditionalFormats", 0], {"gradientRule": {}}),
+            compose(
+                Deletion(["conditionalFormats", 0, "booleanRule"]),
+                Mutation(["conditionalFormats", 0, "gradientRule"], {}),
+            ),
             False,
             "single color",
         ),
@@ -138,7 +144,10 @@ def test_has_equal_conditional_formats(solution_data, trans, correct, match):
     [
         (Identity(), True, None),
         (
-            Mutation(["conditionalFormats", 1], {"booleanRule": {}}),
+            compose(
+                Deletion(["conditionalFormats", 1, "gradientRule"]),
+                Mutation(["conditionalFormats", 1, "booleanRule"], {}),
+            ),
             False,
             "second .* color scale",
         ),
@@ -171,7 +180,6 @@ def test_has_equal_conditional_formats_3(solution_data_2, trans, correct, match)
         has_equal_conditional_formats(s)
 
 
-@pytest.mark.debug
 def test_has_equal_conditional_formats_fail(solution_data):
     user_data = deepcopy(solution_data)
     user_data["conditionalFormats"][0]["ranges"] = [

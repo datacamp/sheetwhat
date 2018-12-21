@@ -1,15 +1,37 @@
-from .rules import rule_types
 from protowhat import selectors
+import functools
+
+from .rules import rule_types
+from ..Range import Range
+
+
+class ConditionalFormatFilter:
+    def __init__(self, sct_range):
+        self.sct_range = Range(sct_range)
+
+    def __call__(self, conditional_format):
+        for conditional_format_range in conditional_format.get("ranges", []):
+            conditional_format_range_obj = Range(conditional_format_range)
+            if self.sct_range.is_within(conditional_format_range_obj):
+                return True
+        return False
 
 
 def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
-    student_cond_formats = state.student_data["conditionalFormats"]
-    solution_cond_formats = state.solution_data["conditionalFormats"]
+    sct_range_filter = ConditionalFormatFilter(state.sct_range)
+    student_cond_formats = list(
+        filter(sct_range_filter, state.student_data["conditionalFormats"])
+    )
+    solution_cond_formats = list(
+        filter(sct_range_filter, state.solution_data["conditionalFormats"])
+    )
 
     issues = []
 
     if len(student_cond_formats) < len(solution_cond_formats):
-        state.do_test("There aren't enough conditional format rules.")
+        state.do_test(
+            f"There aren't enough conditional format rules defined at `{state.sct_range}`."
+        )
 
     for i, (student_cond_format, solution_cond_format) in enumerate(
         zip(student_cond_formats, solution_cond_formats)
@@ -27,10 +49,6 @@ def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
             "gradientRule", f"The {ordinal} rule is incorrect, expected color scale."
         )
         if len(issues) == 0:
-            bound_rules["equality"](
-                "ranges", f"There ranges of the {ordinal} rule are incorrect."
-            )
-
             bound_rules["equality"](
                 "booleanRule.condition",
                 f"There condition of the {ordinal} rule is incorrect.",
