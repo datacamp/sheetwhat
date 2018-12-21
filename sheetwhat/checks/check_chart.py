@@ -1,4 +1,5 @@
 import functools
+
 from ..utils import range_to_row_columns, row_columns_to_range
 from .rules import with_rules, safe_glom
 
