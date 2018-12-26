@@ -11,7 +11,6 @@ import re
 
 
 def check_range(state, field, field_msg, missing_msg=None):
-
     student_field_content = crop_by_range(state.student_data[field], state.sct_range)
     solution_field_content = crop_by_range(state.solution_data[field], state.sct_range)
 
