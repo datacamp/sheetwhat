@@ -95,9 +95,19 @@ def has_equal_domain(state, rules):
 
 @with_rules
 def has_equal_series(state, rules):
-    series_path = {"basicChart": ("basicChart.series", ["series.sourceRange.sources"])}
+    series_path = {
+        "basicChart": {
+            "source": ("basicChart.series", ["series.sourceRange.sources"]),
+            "color": ("basicChart.series", ["color"]),
+        }
+    }
     if state.node_name in series_path.keys():
         rules["array_equality"](
-            series_path[state.node_name], "the {ordinal} series is not correct"
+            series_path[state.node_name].get("source"),
+            "the {ordinal} serie's source is not correct",
+        )
+        rules["array_equality"](
+            series_path[state.node_name].get("color"),
+            "the {ordinal} serie's color is not correct",
         )
     return state
