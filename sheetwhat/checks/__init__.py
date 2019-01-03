@@ -13,6 +13,8 @@ from sheetwhat.checks.check_chart import (
     has_equal_domain,
     has_equal_title,
     has_equal_series,
+    has_equal_single_series,
+    has_equal_node,
 )
 from sheetwhat.checks.has_equal_conditional_formats import has_equal_conditional_formats
 

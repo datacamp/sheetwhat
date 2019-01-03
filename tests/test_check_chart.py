@@ -51,6 +51,7 @@ def charts():
                     ],
                     "series": [
                         {
+                            "color": {"red": 100},
                             "series": {
                                 "sourceRange": {
                                     "sources": [
@@ -345,6 +346,28 @@ def test_has_equal_domain(solution_data, trans, correct, match):
         s.check_chart().has_equal_domain()
 
 
+## has_equal_single_series
+@pytest.mark.parametrize(
+    "number, min_range, series_type, correct, match",
+    [
+        (1, "B1", "source", True, None),
+        (1, "B1:B8", "source", True, None),
+        (1, "B1:B8", "color", True, None),
+        (2, "B1", "source", False, None),
+        (2, "C1", "source", True, None),
+    ],
+)
+def test_has_equal_single_series(
+    solution_data, number, min_range, series_type, correct, match
+):
+    solution_data = deepcopy(solution_data)
+    student_data = deepcopy(solution_data)
+
+    s = setup_ex_state(student_data, solution_data, "E1")
+    with verify_success(correct, match=match):
+        s.check_chart().has_equal_single_series(number, min_range, series_type)
+
+
 ## has_equal_series
 @pytest.mark.parametrize(
     "trans, correct, match",
@@ -372,7 +395,7 @@ def test_has_equal_domain(solution_data, trans, correct, match):
                 },
             ),
             False,
-            "In the chart at .*, the first serie's source is not correct",
+            "In the chart at .*, the first series' source is not correct",
         ),
         (
             Mutation(
@@ -407,6 +430,42 @@ def test_has_equal_series(solution_data, trans, correct, match):
     s = setup_ex_state(student_data, solution_data, "E1")
     with verify_success(correct, match=match):
         s.check_chart().has_equal_series()
+
+
+## has_equal_node
+@pytest.mark.parametrize(
+    "trans, correct, rule, path, message, match",
+    [
+        (Identity(), True, "equality", "title", "", None),
+        (Identity(), True, "equality", "subtitle", "", None),
+        (
+            Mutation(["charts", 0, "spec", "title"], "Whaat"),
+            False,
+            "equality",
+            "title",
+            '"{actual}"',
+            "Whaat",
+        ),
+        (
+            Mutation(
+                ["charts", 0, "spec", "basicChart", "series", 0, "color"],
+                {"green": 100},
+            ),
+            False,
+            "array_equality",
+            ("basicChart.series", ["color"]),
+            "the {ordinal} series' color is incorrect",
+            "the first series' color is incorrect",
+        ),
+    ],
+)
+def test_has_equal_node(solution_data, trans, correct, rule, path, message, match):
+    solution_data = deepcopy(solution_data)
+    student_data = trans(deepcopy(solution_data))
+
+    s = setup_ex_state(student_data, solution_data, "E1")
+    with verify_success(correct, match=match):
+        s.check_chart().has_equal_node(rule, path, message)
 
 
 @pytest.mark.parametrize(

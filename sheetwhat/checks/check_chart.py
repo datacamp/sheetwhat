@@ -1,6 +1,8 @@
 import functools
+from protowhat import selectors
 
 from ..utils import range_to_row_columns, row_columns_to_range
+from ..Range import Range
 from .rules import with_rules, safe_glom
 
 
@@ -88,8 +90,33 @@ def has_equal_title(state, rules):
 @with_rules
 def has_equal_domain(state, rules):
     domain_path = {"basicChart": "basicChart.domains.0.domain.sourceRange.sources.0"}
-    if state.node_name in domain_path.keys():
+    if state.node_name in domain_path:
         rules["equality"](domain_path[state.node_name], "the X-axis is not correct")
+    return state
+
+
+def equal_sources(student_sources, _solution_sources, min_range):
+    return any(min_range.is_within(Range(source)) for source in student_sources)
+
+
+@with_rules
+def has_equal_single_series(state, number, min_range_str, series_type, rules):
+    base_path = f"basicChart.series.{number - 1}"
+    min_range = Range(min_range_str)
+    series_path = {
+        "basicChart": {
+            "source": f"{base_path}.series.sourceRange.sources",
+            "color": f"{base_path}.color",
+        }
+    }
+    series_equality = {"source": functools.partial(equal_sources, min_range=min_range)}
+    ordinal = selectors.get_ord(number)
+    if state.node_name in series_path:
+        rules["equality"](
+            series_path[state.node_name].get(series_type),
+            f"the {ordinal} series' {series_type} is not correct",
+            series_equality.get(series_type, lambda x, y: x == y),
+        )
     return state
 
 
@@ -101,13 +128,21 @@ def has_equal_series(state, rules):
             "color": ("basicChart.series", ["color"]),
         }
     }
-    if state.node_name in series_path.keys():
+    if state.node_name in series_path:
         rules["array_equality"](
             series_path[state.node_name].get("source"),
-            "the {ordinal} serie's source is not correct",
+            "the {ordinal} series' source is not correct",
         )
         rules["array_equality"](
             series_path[state.node_name].get("color"),
-            "the {ordinal} serie's color is not correct",
+            "the {ordinal} series' color is not correct",
         )
+    return state
+
+
+@with_rules
+def has_equal_node(state, rule, path, message, rules):
+    rule = rules.get(rule)
+    if callable(rule):
+        rule(path, message)
     return state
