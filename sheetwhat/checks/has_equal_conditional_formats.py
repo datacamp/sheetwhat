@@ -51,24 +51,24 @@ def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
         if len(issues) == 0:
             bound_rules["equality"](
                 "booleanRule.condition",
-                f"There condition of the {ordinal} rule is incorrect.",
+                f"The condition of the {ordinal} rule is incorrect.",
             )
             bound_rules["equality"](
                 "booleanRule.format",
-                f"There format of the {ordinal} rule is incorrect.",
+                f"The format of the {ordinal} rule is incorrect.",
             )
 
             bound_rules["equality"](
                 "gradientRule.minpoint",
-                f"There minpoint of the {ordinal} rule is incorrect.",
+                f"The minpoint of the {ordinal} rule is incorrect.",
             )
             bound_rules["equality"](
                 "gradientRule.midpoint",
-                f"There minpoint of the {ordinal} rule is incorrect.",
+                f"The minpoint of the {ordinal} rule is incorrect.",
             )
             bound_rules["equality"](
                 "gradientRule.maxpoint",
-                f"There maxpoint of the {ordinal} rule is incorrect.",
+                f"The maxpoint of the {ordinal} rule is incorrect.",
             )
 
     nb_issues = len(issues)
