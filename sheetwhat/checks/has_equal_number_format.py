@@ -22,6 +22,8 @@ def has_equal_number_format(state, incorrect_msg=None):
     generated_message = None
     standard_message = "In cell `{range}`, did you use the correct number format?"
 
+    # For now, we generally only support cells, not ranges. This means we always
+    # have to look at the content at index 0, 0.
     type_path = "0.0.numberFormat.type"
     student_number_format_type = safe_glom(student_number_format, type_path)
     solution_number_format_type = safe_glom(solution_number_format, type_path)
