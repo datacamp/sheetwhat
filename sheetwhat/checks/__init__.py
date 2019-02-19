@@ -9,6 +9,7 @@ from sheetwhat.checks.check_funcs import (
 )
 from sheetwhat.checks.has_equal_pivot import has_equal_pivot
 from sheetwhat.checks.has_equal_number_format import has_equal_number_format
+from sheetwhat.checks.has_equal_data_validation import has_equal_data_validation
 from sheetwhat.checks.check_chart import (
     check_chart,
     has_equal_domain,
