@@ -21,8 +21,8 @@ def check_range(state, field, field_msg, missing_msg=None):
         state.report(_msg)
 
     return state.to_child(
-        {**copy.deepcopy(state.student_data), field: student_field_content},
-        {**copy.deepcopy(state.solution_data), field: solution_field_content},
+        student_field_content,
+        solution_field_content,
     )
 
 
@@ -35,7 +35,7 @@ def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x
         else:
             return re.search(pattern, str(on_text)) is not None
 
-    student_formulas_normalized = map_2d(normalize, child.student_data["formulas"])
+    student_formulas_normalized = map_2d(normalize, child.student_data)
     student_matches = map_2d(match, student_formulas_normalized)
 
     if not all([all(row) for row in student_matches]):
@@ -81,8 +81,8 @@ def check_operator(state, operator, missing_msg=None):
 def has_equal_value(state, incorrect_msg=None, ndigits=4):
     child = check_range(state, field="values", field_msg="value")
 
-    student_values_rounded = round_array_2d(child.student_data["values"], ndigits)
-    solution_values_rounded = round_array_2d(child.solution_data["values"], ndigits)
+    student_values_rounded = round_array_2d(child.student_data, ndigits)
+    solution_values_rounded = round_array_2d(child.solution_data, ndigits)
 
     if student_values_rounded != solution_values_rounded:
         _msg = (incorrect_msg or "The value at `{range}` is not correct.").format(
@@ -97,8 +97,8 @@ def has_equal_value(state, incorrect_msg=None, ndigits=4):
 def has_equal_formula(state, incorrect_msg=None, ndigits=4):
     child = check_range(state, field="formulas", field_msg="formula")
 
-    student_formulas_normalized = normalize_array_2d(child.student_data["formulas"])
-    solution_formulas_normalized = normalize_array_2d(child.solution_data["formulas"])
+    student_formulas_normalized = normalize_array_2d(child.student_data)
+    solution_formulas_normalized = normalize_array_2d(child.solution_data)
 
     if student_formulas_normalized != solution_formulas_normalized:
         _msg = (
@@ -117,8 +117,8 @@ def has_equal_references(state, absolute=False, incorrect_msg=None):
     else:
         pattern = r"[A-Za-z]+\d+(?:\:[A-Za-z]+\d+)?"
 
-    student_formulas = child.student_data["formulas"]
-    solution_formulas = child.solution_data["formulas"]
+    student_formulas = child.student_data
+    solution_formulas = child.solution_data
 
     for i, student_row in enumerate(student_formulas):
         for j, student_cell in enumerate(student_row):

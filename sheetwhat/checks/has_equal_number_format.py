@@ -16,8 +16,8 @@ number_format_types = {
 def has_equal_number_format(state, incorrect_msg=None):
     child = check_range(state, field="numberFormats", field_msg="number format")
 
-    student_number_format = child.student_data["numberFormats"]
-    solution_number_format = child.solution_data["numberFormats"]
+    student_number_format = child.student_data
+    solution_number_format = child.solution_data
 
     generated_message = None
     standard_message = "In cell `{range}`, did you use the correct number format?"

@@ -5,8 +5,8 @@ from .rules import safe_glom
 def has_equal_data_validation(state, incorrect_msg=None):
     child = check_range(state, field="dataValidations", field_msg="data validation")
 
-    student_data_validation = child.student_data["dataValidations"]
-    solution_data_validation = child.solution_data["dataValidations"]
+    student_data_validation = child.student_data
+    solution_data_validation = child.solution_data
 
     message = "In cell `{range}`, did you use the correct data validation?"
 

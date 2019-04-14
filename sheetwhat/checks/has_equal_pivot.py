@@ -7,8 +7,8 @@ from .rules import rule_types, safe_glom
 def has_equal_pivot(state, extra_msg=None):
     child = check_range(state, field="pivotTables", field_msg="pivot table")
 
-    student_pivot_tables = child.student_data["pivotTables"]
-    solution_pivot_tables = child.solution_data["pivotTables"]
+    student_pivot_tables = child.student_data
+    solution_pivot_tables = child.solution_data
 
     for i, student_row in enumerate(student_pivot_tables):
         for j, student_pivot_table in enumerate(student_row):
