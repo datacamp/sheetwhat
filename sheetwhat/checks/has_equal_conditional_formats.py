@@ -29,7 +29,7 @@ def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
     issues = []
 
     if len(student_cond_formats) < len(solution_cond_formats):
-        state.do_test(
+        state.report(
             f"There aren't enough conditional format rules defined at `{state.sct_range}`."
         )
 
@@ -79,4 +79,4 @@ def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
             f"issue{'s' if nb_issues > 1 else ''} with the conditional "
             f"formatting rules:\n\n{_issues_msg}\n"
         )
-        state.do_test(_msg)
+        state.report(_msg)

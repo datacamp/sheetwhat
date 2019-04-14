@@ -15,16 +15,16 @@ class State(BaseState):
         assert isinstance(message, str)
         self.root_message = message
 
-    def do_test(self, message_or_issues, *args, **kwargs):
+    def report(self, message_or_issues, *args, **kwargs):
         is_list = isinstance(message_or_issues, list)
         is_str = isinstance(message_or_issues, str)
         assert is_list or is_str
         if is_list:
-            return self.reporter.do_test(
+            return self.reporter.report(
                 self.root_message, message_or_issues, *args, **kwargs
             )
         if is_str:
-            return self.reporter.do_test(message_or_issues)
+            return self.reporter.report(message_or_issues)
 
     def to_child(self, student_data, solution_data, node_name=None):
         """Basic implementation of returning a child state"""

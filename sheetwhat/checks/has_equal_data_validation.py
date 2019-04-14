@@ -20,7 +20,7 @@ def has_equal_data_validation(state, incorrect_msg=None):
         solution_data_validation, condition_path
     )
     if student_data_validation_condtion != solution_data_validation_condtion:
-        child.do_test(
+        child.report(
             (incorrect_msg or message).format(**state.to_message_exposed_dict())
         )
 

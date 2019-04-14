@@ -40,7 +40,7 @@ def has_equal_number_format(state, incorrect_msg=None):
         generated_message = standard_message
 
     if generated_message is not None:
-        child.do_test(
+        child.report(
             (incorrect_msg or generated_message).format(
                 **state.to_message_exposed_dict()
             )

@@ -52,7 +52,7 @@ def find_chart(charts, sct_range):
 def check_chart(state, extra_msg=None):
     solution_chart = find_chart(state.solution_data["charts"], state.sct_range)
     if len(state.student_data["charts"]) == 0:
-        state.do_test(f"Please create a chart near `{state.sct_range}`.")
+        state.report(f"Please create a chart near `{state.sct_range}`.")
     student_chart = find_chart(state.student_data["charts"], state.sct_range)
     student_chart_anchor = row_columns_to_range(find_chart_anchor(student_chart))
 
@@ -63,13 +63,13 @@ def check_chart(state, extra_msg=None):
     )
 
     if safe_glom(student_chart, f"spec.{solution_chart_type}") is None:
-        state.do_test(chart_type_msg)
+        state.report(chart_type_msg)
     elif solution_chart_type == "basicChart":
         chart_type_path = "spec.basicChart.chartType"
         student_chart_type = safe_glom(student_chart, chart_type_path)
         detailed_solution_chart_type = safe_glom(solution_chart, chart_type_path)
         if student_chart_type != detailed_solution_chart_type:
-            state.do_test(chart_type_msg)
+            state.report(chart_type_msg)
 
     state.set_root_message(f"in the chart at `{student_chart_anchor}`")
 

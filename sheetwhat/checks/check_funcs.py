@@ -18,7 +18,7 @@ def check_range(state, field, field_msg, missing_msg=None):
         _msg = (missing_msg or "Please fill in a {field_msg} in `{range}`.").format(
             field_msg=field_msg, **state.to_message_exposed_dict()
         )
-        state.do_test(_msg)
+        state.report(_msg)
 
     return state.to_child(
         {**copy.deepcopy(state.student_data), field: student_field_content},
@@ -42,7 +42,7 @@ def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x
         _msg = (
             incorrect_msg or "In cell `{range}`, did you use the correct formula?"
         ).format(**state.to_message_exposed_dict())
-        child.do_test(_msg)
+        child.report(_msg)
 
     return state
 
@@ -89,7 +89,7 @@ def has_equal_value(state, incorrect_msg=None, ndigits=4):
             **child.to_message_exposed_dict()
         )
 
-        child.do_test(_msg)
+        child.report(_msg)
 
     return state
 
@@ -104,7 +104,7 @@ def has_equal_formula(state, incorrect_msg=None, ndigits=4):
         _msg = (
             incorrect_msg or "In cell `{range}`, did you use the correct formula?"
         ).format(**state.to_message_exposed_dict())
-        child.do_test(_msg)
+        child.report(_msg)
 
     return state
 
@@ -139,4 +139,4 @@ def has_equal_references(state, absolute=False, incorrect_msg=None):
                         reference=reference,
                         **child.to_message_exposed_dict()
                     )
-                    child.do_test(_msg)
+                    child.report(_msg)

@@ -139,4 +139,4 @@ def has_equal_pivot(state, extra_msg=None):
                     f"issue{'s' if nb_issues > 1 else ''} with the pivot table "
                     f"at `{child.sct_range}`:\n\n{_issues_msg}\n"
                 )
-                child.do_test(_msg)
+                child.report(_msg)

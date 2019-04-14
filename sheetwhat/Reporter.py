@@ -1,4 +1,6 @@
+from protowhat.Feedback import Feedback
 from protowhat.Reporter import Reporter
+from protowhat.Test import Fail
 
 from .utils import lower_first, upper_first
 
@@ -17,7 +19,7 @@ class SheetwhatReporter(Reporter):
     def __init__(self):
         super().__init__()
 
-    def do_test(
+    def report(
         self,
         feedback_or_root_message,
         issues=None,
@@ -26,6 +28,6 @@ class SheetwhatReporter(Reporter):
     ):
         if isinstance(issues, list) and len(issues) > 0:
             formatter = formatters[formatting_strategy](**formatting_options)
-            return super().do_test(formatter(feedback_or_root_message, issues))
+            return super().do_test(Fail(Feedback(formatter(feedback_or_root_message, issues))))
         else:
-            return super().do_test(feedback_or_root_message)
+            return super().do_test(Fail(Feedback(feedback_or_root_message)))
