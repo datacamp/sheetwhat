@@ -4,7 +4,7 @@ from protowhat import selectors
 from sheetwhat.selectors import state_selector, Dispatcher
 from ..utils import range_to_row_columns, row_columns_to_range
 from ..Range import Range
-from .rules import EqualityTest, ArrayEqualLengthTest, array_element_tests
+from sheetwhat.Test import EqualityTest, ArrayEqualLengthTest, array_element_tests
 
 
 def infer_chart_type(chart):

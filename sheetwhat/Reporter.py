@@ -1,7 +1,3 @@
-from protowhat.Feedback import Feedback
-from protowhat.Reporter import Reporter
-from protowhat.Test import Fail
-
 from .utils import lower_first, upper_first
 
 
@@ -13,21 +9,3 @@ class FirstIssueFormatter:
 
 
 formatters = {"first_issue": FirstIssueFormatter}
-
-
-class SheetwhatReporter(Reporter):
-    def __init__(self):
-        super().__init__()
-
-    def report(
-        self,
-        feedback_or_root_message,
-        issues=None,
-        formatting_strategy="first_issue",
-        formatting_options={},
-    ):
-        if isinstance(issues, list) and len(issues) > 0:
-            formatter = formatters[formatting_strategy](**formatting_options)
-            return super().do_test(Fail(Feedback(formatter(feedback_or_root_message, issues))))
-        else:
-            return super().do_test(Fail(Feedback(feedback_or_root_message)))

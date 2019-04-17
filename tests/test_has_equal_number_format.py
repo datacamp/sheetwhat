@@ -105,7 +105,6 @@ def user_data_seed():
             False,
             "In cell `B2`, did you use the correct number format?",
         ),
-
     ],
 )
 def test_has_equal_number_format(user_data_seed, trans, sct_range, correct, match):

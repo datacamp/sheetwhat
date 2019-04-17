@@ -13,6 +13,7 @@ from tests.helper import (
 
 from sheetwhat.checks import check_chart
 
+
 # Fixtures
 @pytest.fixture()
 def charts():
@@ -248,7 +249,7 @@ def solution_data(charts):
 
 # Tests
 
-## check_chart
+# check_chart
 @pytest.mark.parametrize(
     "trans, correct, match",
     [
@@ -272,7 +273,7 @@ def test_check_chart(solution_data, trans, correct, match):
         s.check_chart()
 
 
-## has_equal_title
+# has_equal_title
 @pytest.mark.parametrize(
     "trans, correct, match",
     [
@@ -301,7 +302,7 @@ def test_has_equal_title(solution_data, trans, correct, match):
         s.check_chart().has_equal_title()
 
 
-## has_equal_domain
+# has_equal_domain
 @pytest.mark.parametrize(
     "trans, correct, match",
     [
@@ -346,7 +347,7 @@ def test_has_equal_domain(solution_data, trans, correct, match):
         s.check_chart().has_equal_domain()
 
 
-## has_equal_single_series
+# has_equal_single_series
 @pytest.mark.parametrize(
     "number, min_range, series_type, correct, match",
     [
@@ -368,7 +369,7 @@ def test_has_equal_single_series(
         s.check_chart().has_equal_single_series(number, min_range, series_type)
 
 
-## has_equal_series
+# has_equal_series
 @pytest.mark.parametrize(
     "trans, correct, match",
     [
@@ -432,7 +433,7 @@ def test_has_equal_series(solution_data, trans, correct, match):
         s.check_chart().has_equal_series()
 
 
-## has_equal_node
+# has_equal_node
 @pytest.mark.parametrize(
     "trans, correct, rule, path, message, match",
     [

@@ -6,7 +6,6 @@ from sheetwhat.utils import (
     map_2d,
     normalize_formula,
 )
-import copy
 import re
 
 
@@ -21,8 +20,7 @@ def check_range(state, field, field_msg, missing_msg=None):
         state.report(_msg)
 
     return state.to_child(
-        student_field_content,
-        solution_field_content,
+        student_data=student_field_content, solution_data=solution_field_content
     )
 
 

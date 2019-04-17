@@ -1,7 +1,7 @@
 from protowhat import selectors
 from protowhat.Reporter import TestRunnerProxy
 
-from sheetwhat.checks.rules import ExistenceTest, EqualityTest
+from sheetwhat.Test import ExistenceTest, EqualityTest
 from sheetwhat.selectors import dispatcher_selector
 from ..Range import Range
 

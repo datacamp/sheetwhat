@@ -4,7 +4,7 @@ from sheetwhat.checks import check_range
 from sheetwhat.selectors import dispatcher_selector
 from sheetwhat.utils import dict_keys, normalize_formula
 
-from .rules import (
+from sheetwhat.Test import (
     ExistenceTest,
     OverExistenceTest,
     EqualityTest,
