@@ -1,5 +1,5 @@
-from .check_funcs import check_range
-from .rules import safe_glom
+from sheetwhat.selectors import Dispatcher
+from sheetwhat.checks.check_funcs import check_range
 
 number_format_types = {
     "TEXT": "text",
@@ -25,8 +25,8 @@ def has_equal_number_format(state, incorrect_msg=None):
     # For now, we generally only support cells, not ranges. This means we always
     # have to look at the content at index 0, 0.
     type_path = "0.0.numberFormat.type"
-    student_number_format_type = safe_glom(student_number_format, type_path)
-    solution_number_format_type = safe_glom(solution_number_format, type_path)
+    student_number_format_type = Dispatcher().select(type_path, student_number_format)
+    solution_number_format_type = Dispatcher().select(type_path, solution_number_format)
     if student_number_format_type != solution_number_format_type:
         actual_type = number_format_types.get(student_number_format_type)
         expected_type = number_format_types.get(solution_number_format_type)

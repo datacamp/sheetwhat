@@ -1,156 +1,159 @@
-import glom
+import copy
 import functools
-from sheetwhat.utils import is_empty, dict_keys, normalize_formula
+
+from abc import ABC
+
 from protowhat import selectors
+from protowhat.Test import Test
+from protowhat.Feedback import Feedback as ProtoFeedback
 
-from ..utils import lower_first
-
-# Supercharge path with appropriate coalesce at every level
-# E.g.
-#  deep_coalesce("path", None) => Coalesce("path", default=None)
-#  deep_coalesce(("path", ), None) =>
-#    Coalesce((Coalesce("path", default=None),), default=None)
-# etc. (tuples and lists work analogously)
-def deep_coalesce(path, default):
-    if isinstance(path, (tuple, list)):
-        path = type(path)(deep_coalesce(p, default) for p in path)
-    return glom.Coalesce(path, default=default)
+from sheetwhat.utils import is_empty, dict_keys, normalize_formula
 
 
-def safe_glom(obj, path, fallback=None):
-    return glom.glom(obj, deep_coalesce(path, fallback))
+class Feedback(ProtoFeedback):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
-class Rule:
-    def __init__(self, student_structure, solution_structure, issues):
-        self.student_structure = student_structure
-        self.solution_structure = solution_structure
-        self.issues = issues
-
-    def __call__(self, *args, tag=None, **kwargs):
-        self.call(*args, **kwargs)
+class SolutionBasedTest(Test, ABC):
+    def __init__(self, student_data, solution_data, feedback):
+        super().__init__(feedback)
+        self.student_data = student_data
+        self.solution_data = solution_data
 
 
-class ArrayEqualityRule(Rule):
-    def call(self, path, message, equal_func=lambda x, y: x == y):
-        solution_array = safe_glom(self.solution_structure, path)
-        student_array = safe_glom(self.student_structure, path)
-        if not isinstance(student_array, list):
+def array_element_tests(test, student_data, solution_data, feedback, *args, **kwargs):
+    tests = []
+    if not isinstance(student_data, list) or not isinstance(solution_data, list):
+        # todo: no feedback? what is the use case?
+        return tests
+    for i, element_data in enumerate(zip(student_data, solution_data)):
+        if isinstance(feedback, str):
+            item_feedback = Feedback(feedback)
+        else:
+            item_feedback = copy.deepcopy(feedback)
+        item_feedback.message = item_feedback.message.format(
+            ordinal=selectors.get_ord(i + 1),
+            expected=solution_data[i],
+            actual=student_data[i],
+        )
+        tests.append(test(*element_data, item_feedback, *args, **kwargs))
+    return tests
+
+
+class ArrayEqualityTest(SolutionBasedTest):
+    # todo: not used anymore
+    # todo: for a Test like this to work, one of these is needed:
+    #  - recursive test() call returning and running subtests
+    #  - test.feedback is a list
+    #  - test.feedback can be both a list or a single feedback instance
+    def __init__(self, *args, equal_func=lambda x, y: x == y):
+        super().__init__(*args)
+        self.equal_func = equal_func
+
+    def test(self):
+        if not isinstance(self.student_data, list) or not isinstance(
+            self.solution_data, list
+        ):
             return
-        if not isinstance(solution_array, list):
-            return
-        if solution_array != student_array:
-            matches = [equal_func(x, y) for x, y in zip(student_array, solution_array)]
-            mismatch_reducer = lambda all, x: all if x[1] else [*all, x[0]]
+        if self.student_data != self.solution_data:
+            self.result = False
+
+            # TODO
+            matches = [
+                self.equal_func(x, y)
+                for x, y in zip(self.student_data, self.solution_data)
+            ]
+
+            def mismatch_reducer(all, x):
+                return all if x[1] else [*all, x[0]]
+
             mismatch_indices = functools.reduce(
                 mismatch_reducer, enumerate(matches), []
             )
 
-            self.issues.extend(
+            self.feedback.issues.extend(
                 [
-                    message.format(
+                    self.feedback.message.format(
                         ordinal=selectors.get_ord(i + 1),
-                        expected=solution_array[i],
-                        actual=student_array[i],
+                        expected=self.solution_data[i],
+                        actual=self.student_data[i],
                     )
                     for i in mismatch_indices
                 ]
             )
+        else:
+            self.result = True
 
 
-class ArrayEqualLengthRule(Rule):
-    def call(self, path, message):
-        solution_array = safe_glom(self.solution_structure, path)
-        student_array = safe_glom(self.student_structure, path)
-        if not isinstance(student_array, list):
+class ArrayEqualLengthTest(SolutionBasedTest):
+    def test(self):
+        if not isinstance(self.student_data, list):
             return
-        if not isinstance(solution_array, list) or len(solution_array) == 0:
-            return
-        solution_array_len = len(solution_array)
-        student_array_len = len(student_array)
+        if not isinstance(self.solution_data, list) or len(self.solution_data) == 0:
+            return  # TODO ?
+        solution_array_len = len(self.solution_data)
+        student_array_len = len(self.student_data)
         if solution_array_len != student_array_len:
-            self.issues.append(
-                message.format(expected=solution_array_len, actual=student_array_len)
+            self.result = False
+            self.feedback.message = self.feedback.message.format(
+                expected=solution_array_len, actual=student_array_len
             )
+        else:
+            self.result = True
 
 
-class DictKeyEqualityRule(Rule):
-    def call(self, path, message):
-        solution_dict = safe_glom(self.solution_structure, path)
-        student_dict = safe_glom(self.student_structure, path)
-        if not isinstance(student_dict, dict) or not isinstance(solution_dict, dict):
+class DictKeyEqualityTest(SolutionBasedTest):
+    def test(self):
+        if not isinstance(self.student_data, dict) or not isinstance(
+            self.solution_data, dict
+        ):
             return
-        solution_key_set = set(solution_dict.keys())
-        student_key_set = set(student_dict.keys())
+        solution_key_set = set(self.solution_data.keys())
+        student_key_set = set(self.student_data.keys())
         if solution_key_set != student_key_set:
-            self.issues.append(
-                message.format(
-                    solution_keys=solution_key_set, student_keys=student_key_set
-                )
+            self.result = False
+            self.feedback.message = self.feedback.message.format(
+                solution_keys=solution_key_set, student_keys=student_key_set
             )
 
 
-class EqualityRule(Rule):
-    def call(self, path, message, equal_func=lambda x, y: x == y):
-        solution_field = safe_glom(self.solution_structure, path)
-        student_field = safe_glom(self.student_structure, path)
-        if not equal_func(student_field, solution_field):
-            self.issues.append(
-                message.format(expected=solution_field, actual=student_field)
+class EqualityTest(SolutionBasedTest):
+    def __init__(
+        self, student_data, solution_data, feedback, equal_func=lambda x, y: x == y
+    ):
+        super().__init__(student_data, solution_data, feedback)
+        self.equal_func = equal_func
+
+    def test(self):
+        if self.equal_func(self.student_data, self.solution_data):
+            self.result = True
+        else:
+            self.result = False
+            self.feedback.message = self.feedback.message.format(
+                expected=self.solution_data, actual=self.student_data
             )
 
 
-class ExistenceRule(Rule):
-    def call(self, path, message):
-        if not is_empty(safe_glom(self.solution_structure, path)) and is_empty(
-            safe_glom(self.student_structure, path)
+class ExistenceTest(SolutionBasedTest):
+    def test(self):
+        if not is_empty(self.solution_data) and is_empty(self.student_data):
+            self.result = False
+
+
+class OverExistenceTest(SolutionBasedTest):
+    def test(self):
+        if is_empty(self.solution_data) and not is_empty(self.student_data):
+            self.result = False
+
+
+class SetEqualityTest(SolutionBasedTest):
+    def test(self):
+        if not isinstance(self.student_data, list) or not isinstance(
+            self.solution_data, list
         ):
-            self.issues.append(message)
-
-
-class OverExistenceRule(Rule):
-    def call(self, path, message):
-        if is_empty(safe_glom(self.solution_structure, path)) and not is_empty(
-            safe_glom(self.student_structure, path)
-        ):
-            self.issues.append(message)
-
-
-class SetEqualityRule(Rule):
-    def call(self, path, message):
-        solution_array = safe_glom(self.solution_structure, path)
-        student_array = safe_glom(self.student_structure, path)
-        if not isinstance(student_array, list) or not isinstance(solution_array, list):
             return
-        solution_set = set(solution_array)
-        student_set = set(student_array)
+        solution_set = set(self.solution_data)
+        student_set = set(self.student_data)
         if solution_set != student_set:
-            self.issues.append(message)
-
-
-rule_types = {
-    "array_equal_length": ArrayEqualLengthRule,
-    "array_equality": ArrayEqualityRule,
-    "dict_key_equality": DictKeyEqualityRule,
-    "equality": EqualityRule,
-    "existence": ExistenceRule,
-    "over_existence": OverExistenceRule,
-    "set_equality": SetEqualityRule,
-}
-
-
-def with_rules(func):
-    @functools.wraps(func)
-    def wrapper_with_rules(state, *args, **kwargs):
-        issues = []
-        bound_rules = {
-            key: RuleClass(state.student_data, state.solution_data, issues)
-            for key, RuleClass in rule_types.items()
-        }
-        result = func(state, *args, rules=bound_rules, **kwargs)
-        nb_issues = len(issues)
-        if nb_issues > 0:
-            state.do_test(issues)
-        return result
-
-    return wrapper_with_rules
+            self.result = False

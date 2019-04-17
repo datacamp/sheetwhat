@@ -1,5 +1,10 @@
+from protowhat.Feedback import Feedback
 from protowhat.State import State as BaseState
 import copy
+
+from protowhat.Test import Fail
+
+from sheetwhat.selectors import Dispatcher
 
 
 class State(BaseState):
@@ -8,31 +13,23 @@ class State(BaseState):
         self.solution_data = solution_data
         self.sct_range = sct_range
         self.reporter = reporter
+        self.messages = []
+        self.dispatcher = Dispatcher()
         self.node_name = "root"
-        self.root_message = ""
+        self.force_diagnose = False  # todo
 
-    def set_root_message(self, message):
-        assert isinstance(message, str)
-        self.root_message = message
+    def report(self, feedback: str):
+        return self.do_test(Fail(Feedback(feedback)))
 
-    def report(self, message_or_issues, *args, **kwargs):
-        is_list = isinstance(message_or_issues, list)
-        is_str = isinstance(message_or_issues, str)
-        assert is_list or is_str
-        if is_list:
-            return self.reporter.report(
-                self.root_message, message_or_issues, *args, **kwargs
-            )
-        if is_str:
-            return self.reporter.report(message_or_issues)
-
-    def to_child(self, student_data, solution_data, node_name=None):
+    def to_child(self, append_message="", node_name=None, **kwargs):
         """Basic implementation of returning a child state"""
         child = copy.deepcopy(self)
-        child.student_data = student_data
-        child.solution_data = solution_data
+        for kwarg in kwargs:
+            setattr(child, kwarg, kwargs[kwarg])
         child.node_name = node_name
-        child.parent = self
+        if not isinstance(append_message, dict):
+            append_message = {"msg": append_message, "kwargs": {}}
+        child.messages = [*self.messages, append_message]
         return child
 
     def to_message_exposed_dict(self):

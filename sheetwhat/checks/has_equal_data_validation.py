@@ -1,5 +1,5 @@
 from .check_funcs import check_range
-from .rules import safe_glom
+from sheetwhat.selectors import Dispatcher
 
 
 def has_equal_data_validation(state, incorrect_msg=None):
@@ -13,11 +13,11 @@ def has_equal_data_validation(state, incorrect_msg=None):
     # For now, we generally only support cells, not ranges. This means we always
     # have to look at the content at index 0, 0.
     condition_path = "0.0.condition"
-    student_data_validation_condtion = safe_glom(
-        student_data_validation, condition_path
+    student_data_validation_condtion = Dispatcher().select(
+        condition_path, student_data_validation
     )
-    solution_data_validation_condtion = safe_glom(
-        solution_data_validation, condition_path
+    solution_data_validation_condtion = Dispatcher().select(
+        condition_path, solution_data_validation
     )
     if student_data_validation_condtion != solution_data_validation_condtion:
         child.report(

@@ -1,6 +1,6 @@
 from protowhat.Test import TestFail
+from protowhat.Reporter import Reporter
 
-from sheetwhat.Reporter import SheetwhatReporter
 from sheetwhat.sct_syntax import SCT_CTX
 from sheetwhat.State import State
 
@@ -13,7 +13,7 @@ def test_exercise(sct, student_data, solution_data, success_msg=None):
     assert isinstance(student_data, dict)
     assert isinstance(solution_data, dict)
 
-    rep = SheetwhatReporter()
+    rep = Reporter()
     for single_sct in sct:
         state = State(
             student_data=student_data,
