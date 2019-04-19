@@ -5,7 +5,9 @@ from sheetwhat.sct_syntax import SCT_CTX
 from sheetwhat.State import State
 
 
-def test_exercise(sct, student_data, solution_data, success_msg=None):
+def test_exercise(
+    sct, student_data, solution_data, success_msg=None, force_diagnose=False
+):
     """
     """
 
@@ -20,6 +22,7 @@ def test_exercise(sct, student_data, solution_data, success_msg=None):
             solution_data=solution_data,
             sct_range=single_sct.get("range"),
             reporter=rep,
+            force_diagnose=force_diagnose
         )
 
         SCT_CTX["Ex"].root_state = state

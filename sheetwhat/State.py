@@ -8,7 +8,9 @@ from sheetwhat.selectors import Dispatcher
 
 
 class State(BaseState):
-    def __init__(self, student_data, solution_data, sct_range, reporter):
+    def __init__(
+        self, student_data, solution_data, sct_range, reporter, force_diagnose=False
+    ):
         self.student_data = student_data
         self.solution_data = solution_data
         self.sct_range = sct_range
@@ -16,7 +18,7 @@ class State(BaseState):
         self.messages = []
         self.dispatcher = Dispatcher()
         self.node_name = "root"
-        self.force_diagnose = False  # todo
+        self.force_diagnose = force_diagnose
 
     def report(self, feedback: str):
         return self.do_test(Fail(Feedback(feedback)))
