@@ -5,16 +5,21 @@ from sheetwhat.utils import (
     normalize_array_2d,
     map_2d,
     normalize_formula,
-)
+    is_array_2d)
 import re
 
 
-def check_range(state, field, field_msg, missing_msg=None):
-    student_field_content = crop_by_range(state.student_data[field], state.sct_range)
-    solution_field_content = crop_by_range(state.solution_data[field], state.sct_range)
+def check_field(state, field, field_msg, missing_msg=None):
+    # todo: split in check_field (protowhat check_edge wrapper) and check_range
+    student_field_content = state.student_data[field]
+    solution_field_content = state.solution_data[field]
+
+    if is_array_2d(solution_field_content):
+        student_field_content = crop_by_range(student_field_content, state.sct_range)
+        solution_field_content = crop_by_range(solution_field_content, state.sct_range)
 
     if is_empty(student_field_content):
-        _msg = (missing_msg or "Please fill in a {field_msg} in `{range}`.").format(
+        _msg = (missing_msg or "Please make sure there is a {field_msg} in `{range}`.").format(
             field_msg=field_msg, **state.to_message_exposed_dict()
         )
         state.report(_msg)
@@ -25,7 +30,7 @@ def check_range(state, field, field_msg, missing_msg=None):
 
 
 def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x: x):
-    child = check_range(state, field="formulas", field_msg="formula")
+    child = check_field(state, field="formulas", field_msg="formula")
 
     def match(on_text):
         if fixed:
@@ -77,7 +82,10 @@ def check_operator(state, operator, missing_msg=None):
 
 
 def has_equal_value(state, incorrect_msg=None, ndigits=4):
-    child = check_range(state, field="values", field_msg="value")
+    # todo: don't do check_field if not on the root state
+    #  so it can be used after check_field as well? (+ tests)
+    #  deprecate has_equal_node after that?
+    child = check_field(state, field="values", field_msg="value")
 
     student_values_rounded = round_array_2d(child.student_data, ndigits)
     solution_values_rounded = round_array_2d(child.solution_data, ndigits)
@@ -93,7 +101,7 @@ def has_equal_value(state, incorrect_msg=None, ndigits=4):
 
 
 def has_equal_formula(state, incorrect_msg=None, ndigits=4):
-    child = check_range(state, field="formulas", field_msg="formula")
+    child = check_field(state, field="formulas", field_msg="formula")
 
     student_formulas_normalized = normalize_array_2d(child.student_data)
     solution_formulas_normalized = normalize_array_2d(child.solution_data)
@@ -108,7 +116,7 @@ def has_equal_formula(state, incorrect_msg=None, ndigits=4):
 
 
 def has_equal_references(state, absolute=False, incorrect_msg=None):
-    child = check_range(state, field="formulas", field_msg="formula")
+    child = check_field(state, field="formulas", field_msg="formula")
 
     if absolute:
         pattern = r"\$?[A-Z]+\$?\d+(?:\:\$?[A-Z]+\$?\d+)?"

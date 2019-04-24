@@ -8,8 +8,8 @@ from sheetwhat.checks import *
 @pytest.mark.parametrize(
     "field, field_msg, patt",
     [
-        ("values", "value", "Please fill in a value in `B1`."),
-        ("formulas", "formula", "Please fill in a formula in `B1`."),
+        ("values", "value", "Please make sure there is a value in `B1`."),
+        ("formulas", "formula", "Please make sure there is a formula in `B1`."),
     ],
 )
 def test_check_range(field, field_msg, patt):
@@ -19,7 +19,7 @@ def test_check_range(field, field_msg, patt):
         "B1",
     )
     with pytest.raises(TF, match=patt):
-        check_range(s, field, field_msg)
+        check_field(s, field, field_msg)
 
 
 def test_has_code():

@@ -1,6 +1,6 @@
 from protowhat.Reporter import TestRunnerProxy
 
-from sheetwhat.checks import check_range
+from sheetwhat.checks import check_field
 from sheetwhat.selectors import dispatcher_selector
 from sheetwhat.utils import dict_keys, normalize_formula
 
@@ -16,7 +16,7 @@ from sheetwhat.Test import (
 
 
 def has_equal_pivot(state, extra_msg=None):
-    child = check_range(state, field="pivotTables", field_msg="pivot table")
+    child = check_field(state, field="pivotTables", field_msg="pivot table")
 
     student_pivot_tables = child.student_data
     solution_pivot_tables = child.solution_data

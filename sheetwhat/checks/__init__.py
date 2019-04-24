@@ -1,6 +1,6 @@
 from sheetwhat.checks.check_funcs import (
     has_code,
-    check_range,
+    check_field,
     has_equal_value,
     has_equal_formula,
     has_equal_references,

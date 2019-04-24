@@ -94,6 +94,10 @@ def is_empty(x):
         return x is None
 
 
+def is_array_2d(x):
+    return isinstance(x, list) and all([isinstance(i, list) for i in x])
+
+
 def round_array_2d(array_2d, ndigits):
     round_value = lambda x: round(x, ndigits) if isinstance(x, (int, float)) else x
     return map_2d(round_value, array_2d)

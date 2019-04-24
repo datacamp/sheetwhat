@@ -1,9 +1,9 @@
-from .check_funcs import check_range
+from .check_funcs import check_field
 from sheetwhat.selectors import Dispatcher
 
 
 def has_equal_data_validation(state, incorrect_msg=None):
-    child = check_range(state, field="dataValidations", field_msg="data validation")
+    child = check_field(state, field="dataValidations", field_msg="data validation")
 
     student_data_validation = child.student_data
     solution_data_validation = child.solution_data

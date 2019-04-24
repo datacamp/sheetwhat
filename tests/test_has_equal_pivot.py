@@ -234,7 +234,7 @@ def solution_data_calculated_field(pivot_tables_with_calculated_field):
             Mutation(["pivotTables", 0, 0, "source", "startRowIndex"], 1),
             "B1",
             False,
-            r"fill in(.|\s)*pivot table(.|\s)*`B1`",
+            r"make sure(.|\s)*pivot table(.|\s)*`B1`",
         ),
         (
             Mutation(["pivotTables", 0, 0, "rows", 0, "sortOrder"], "DESCENDING"),

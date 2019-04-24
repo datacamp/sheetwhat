@@ -1,7 +1,7 @@
 import pytest
 from copy import deepcopy
 from tests.helper import Identity, Mutation, Deletion, setup_state, verify_success
-from sheetwhat.checks import check_range, has_equal_value
+from sheetwhat.checks import check_field, has_equal_value
 
 
 @pytest.fixture()
@@ -25,7 +25,7 @@ def test_check_range(user_data_seed, trans, sct_range, correct):
     user_data = trans(deepcopy(user_data_seed))
     s = setup_state(user_data, user_data_seed, sct_range)
     with verify_success(correct):
-        check_range(s, field="values", field_msg="value")
+        check_field(s, field="values", field_msg="value")
 
 
 @pytest.mark.parametrize(

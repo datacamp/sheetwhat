@@ -1,5 +1,5 @@
 from sheetwhat.selectors import Dispatcher
-from sheetwhat.checks.check_funcs import check_range
+from sheetwhat.checks.check_funcs import check_field
 
 number_format_types = {
     "TEXT": "text",
@@ -14,7 +14,7 @@ number_format_types = {
 
 
 def has_equal_number_format(state, incorrect_msg=None):
-    child = check_range(state, field="numberFormats", field_msg="number format")
+    child = check_field(state, field="numberFormats", field_msg="number format")
 
     student_number_format = child.student_data
     solution_number_format = child.solution_data
