@@ -1,8 +1,12 @@
+import copy
+
 from protowhat import selectors
 from protowhat.Reporter import TestRunnerProxy
 
 from sheetwhat.Test import ExistenceTest, EqualityTest
 from sheetwhat.selectors import dispatcher_selector
+from sheetwhat.utils import normalize_formula
+
 from ..Range import Range
 
 
@@ -55,9 +59,18 @@ def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
             )
         )
         if not test_runner.has_failed:
+
+            def normalize_condition(condition):
+                if condition and condition.get("type", None) == "CUSTOM_FORMULA":
+                    condition = copy.deepcopy(condition)
+                    condition["values"][0]["userEnteredValue"] = normalize_formula(
+                        condition["values"][0]["userEnteredValue"]
+                    )
+                return condition
+
             tests = [
                 EqualityTest(
-                    *selector("booleanRule.condition"),
+                    *map(normalize_condition, selector("booleanRule.condition")),
                     f"The condition of the {ordinal} rule is incorrect.",
                 ),
                 EqualityTest(
