@@ -9,14 +9,18 @@ from sheetwhat.utils import (
 import re
 
 
-def check_field(state, field, field_msg, missing_msg=None):
+def check_field(state, field, field_msg, missing_msg=None, crop=True):
     # todo: split in check_field (protowhat check_edge wrapper) and check_range
     student_field_content = state.student_data[field]
     solution_field_content = state.solution_data[field]
 
-    if is_array_2d(solution_field_content):
-        student_field_content = crop_by_range(student_field_content, state.sct_range)
-        solution_field_content = crop_by_range(solution_field_content, state.sct_range)
+    if crop and is_array_2d(solution_field_content):
+        if isinstance(crop, bool):
+            crop_range = state.sct_range
+        else:
+            crop_range = crop
+        student_field_content = crop_by_range(student_field_content, crop_range)
+        solution_field_content = crop_by_range(solution_field_content, crop_range)
 
     if is_empty(student_field_content):
         _msg = (missing_msg or "Please make sure there is a {field_msg} in `{range}`.").format(
