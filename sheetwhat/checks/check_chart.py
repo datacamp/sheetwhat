@@ -97,7 +97,7 @@ def has_equal_domain(state):
         state.do_test(
             EqualityTest(
                 *state_selector(state)(domain_path[state.node_name]),
-                "the X-axis is not correct",
+                "the X-axis is not correct.",
             )
         )
     return state
@@ -123,7 +123,7 @@ def has_equal_single_series(state, number, min_range_str, series_type):
         state.do_test(
             EqualityTest(
                 *state_selector(state)(series_path[state.node_name].get(series_type)),
-                f"the {ordinal} series' {series_type} is not correct",
+                f"the {ordinal} series' {series_type} is not correct.",
                 series_equality.get(series_type, lambda x, y: x == y),
             )
         )

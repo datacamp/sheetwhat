@@ -5,14 +5,9 @@ from abc import ABC
 
 from protowhat import selectors
 from protowhat.Test import Test
-from protowhat.Feedback import Feedback as ProtoFeedback
+from protowhat.Feedback import Feedback
 
 from sheetwhat.utils import is_empty, dict_keys, normalize_formula
-
-
-class Feedback(ProtoFeedback):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class SolutionBasedTest(Test, ABC):
@@ -25,65 +20,30 @@ class SolutionBasedTest(Test, ABC):
 def array_element_tests(test, student_data, solution_data, feedback, *args, **kwargs):
     tests = []
     if not isinstance(student_data, list) or not isinstance(solution_data, list):
-        # todo: no feedback? what is the use case?
+        # If student data is None; Feedback will be provided by a different test.
         return tests
-    for i, element_data in enumerate(zip(student_data, solution_data)):
+    for i, (element_student_data, element_solution_data) in enumerate(
+        zip(student_data, solution_data)
+    ):
         if isinstance(feedback, str):
             item_feedback = Feedback(feedback)
         else:
             item_feedback = copy.deepcopy(feedback)
         item_feedback.message = item_feedback.message.format(
             ordinal=selectors.get_ord(i + 1),
-            expected=solution_data[i],
-            actual=student_data[i],
+            expected=element_solution_data,
+            actual=element_student_data,
         )
-        tests.append(test(*element_data, item_feedback, *args, **kwargs))
+        tests.append(
+            test(
+                element_student_data,
+                element_solution_data,
+                item_feedback,
+                *args,
+                **kwargs
+            )
+        )
     return tests
-
-
-class ArrayEqualityTest(SolutionBasedTest):
-    # todo: not used anymore
-    # todo: for a Test like this to work, one of these is needed:
-    #  - recursive test() call returning and running subtests
-    #  - test.feedback is a list
-    #  - test.feedback can be both a list or a single feedback instance
-    def __init__(self, *args, equal_func=lambda x, y: x == y):
-        super().__init__(*args)
-        self.equal_func = equal_func
-
-    def test(self):
-        if not isinstance(self.student_data, list) or not isinstance(
-            self.solution_data, list
-        ):
-            return
-        if self.student_data != self.solution_data:
-            self.result = False
-
-            # TODO
-            matches = [
-                self.equal_func(x, y)
-                for x, y in zip(self.student_data, self.solution_data)
-            ]
-
-            def mismatch_reducer(all, x):
-                return all if x[1] else [*all, x[0]]
-
-            mismatch_indices = functools.reduce(
-                mismatch_reducer, enumerate(matches), []
-            )
-
-            self.feedback.issues.extend(
-                [
-                    self.feedback.message.format(
-                        ordinal=selectors.get_ord(i + 1),
-                        expected=self.solution_data[i],
-                        actual=self.student_data[i],
-                    )
-                    for i in mismatch_indices
-                ]
-            )
-        else:
-            self.result = True
 
 
 class ArrayEqualLengthTest(SolutionBasedTest):
@@ -91,7 +51,7 @@ class ArrayEqualLengthTest(SolutionBasedTest):
         if not isinstance(self.student_data, list):
             return
         if not isinstance(self.solution_data, list) or len(self.solution_data) == 0:
-            return  # TODO ?
+            return  # TODO
         solution_array_len = len(self.solution_data)
         student_array_len = len(self.student_data)
         if solution_array_len != student_array_len:

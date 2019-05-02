@@ -11,8 +11,6 @@ class Dispatcher(DispatcherInterface):
         return []
 
     def select(self, path, node, *args, **kwargs):
-        if not isinstance(path, (str, tuple)):
-            path = ".".join(map(str, path))
         return safe_glom(node, path, *args, **kwargs)
 
     def parse(self, data):

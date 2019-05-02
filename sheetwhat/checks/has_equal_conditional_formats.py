@@ -1,4 +1,5 @@
 import copy
+from functools import partial
 
 from protowhat import selectors
 from protowhat.Reporter import TestRunnerProxy
@@ -10,21 +11,16 @@ from sheetwhat.utils import normalize_formula
 from ..Range import Range
 
 
-class ConditionalFormatFilter:
-    # todo: partial?
-    def __init__(self, sct_range):
-        self.sct_range = Range(sct_range)
-
-    def __call__(self, conditional_format):
-        for conditional_format_range in conditional_format.get("ranges", []):
-            conditional_format_range_obj = Range(conditional_format_range)
-            if self.sct_range.is_within(conditional_format_range_obj):
-                return True
-        return False
+def conditional_format_filter(sct_range, conditional_format_data):
+    for conditional_format_range in conditional_format_data.get("ranges", []):
+        conditional_format_range_obj = Range(conditional_format_range)
+        if Range(sct_range).is_within(conditional_format_range_obj):
+            return True
+    return False
 
 
 def has_equal_conditional_formats(state, absolute=False, incorrect_msg=None):
-    sct_range_filter = ConditionalFormatFilter(state.sct_range)
+    sct_range_filter = partial(conditional_format_filter, state.sct_range)
     student_cond_formats = list(
         filter(sct_range_filter, state.student_data["conditionalFormats"])
     )
