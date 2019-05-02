@@ -1,5 +1,4 @@
 import copy
-import functools
 
 from abc import ABC
 
@@ -48,19 +47,22 @@ def array_element_tests(test, student_data, solution_data, feedback, *args, **kw
 
 class ArrayEqualLengthTest(SolutionBasedTest):
     def test(self):
-        if not isinstance(self.student_data, list):
-            return
-        if not isinstance(self.solution_data, list) or len(self.solution_data) == 0:
-            return  # TODO
-        solution_array_len = len(self.solution_data)
-        student_array_len = len(self.student_data)
-        if solution_array_len != student_array_len:
-            self.result = False
-            self.feedback.message = self.feedback.message.format(
-                expected=solution_array_len, actual=student_array_len
-            )
-        else:
+        if (
+            not isinstance(self.student_data, list)
+            or not isinstance(self.solution_data, list)
+            or len(self.solution_data) == 0
+        ):
             self.result = True
+        else:
+            solution_array_len = len(self.solution_data)
+            student_array_len = len(self.student_data)
+            if solution_array_len != student_array_len:
+                self.result = False
+                self.feedback.message = self.feedback.message.format(
+                    expected=solution_array_len, actual=student_array_len
+                )
+            else:
+                self.result = True
 
 
 class DictKeyEqualityTest(SolutionBasedTest):
@@ -68,14 +70,17 @@ class DictKeyEqualityTest(SolutionBasedTest):
         if not isinstance(self.student_data, dict) or not isinstance(
             self.solution_data, dict
         ):
-            return
-        solution_key_set = set(self.solution_data.keys())
-        student_key_set = set(self.student_data.keys())
-        if solution_key_set != student_key_set:
-            self.result = False
-            self.feedback.message = self.feedback.message.format(
-                solution_keys=solution_key_set, student_keys=student_key_set
-            )
+            self.result = True
+        else:
+            solution_key_set = set(self.solution_data.keys())
+            student_key_set = set(self.student_data.keys())
+            if solution_key_set != student_key_set:
+                self.result = False
+                self.feedback.message = self.feedback.message.format(
+                    solution_keys=solution_key_set, student_keys=student_key_set
+                )
+            else:
+                self.result = True
 
 
 class EqualityTest(SolutionBasedTest):
@@ -99,12 +104,16 @@ class ExistenceTest(SolutionBasedTest):
     def test(self):
         if not is_empty(self.solution_data) and is_empty(self.student_data):
             self.result = False
+        else:
+            self.result = True
 
 
 class OverExistenceTest(SolutionBasedTest):
     def test(self):
         if is_empty(self.solution_data) and not is_empty(self.student_data):
             self.result = False
+        else:
+            self.result = True
 
 
 class SetEqualityTest(SolutionBasedTest):
@@ -112,8 +121,11 @@ class SetEqualityTest(SolutionBasedTest):
         if not isinstance(self.student_data, list) or not isinstance(
             self.solution_data, list
         ):
-            return
-        solution_set = set(self.solution_data)
-        student_set = set(self.student_data)
-        if solution_set != student_set:
-            self.result = False
+            self.result = True
+        else:
+            solution_set = set(self.solution_data)
+            student_set = set(self.student_data)
+            if solution_set != student_set:
+                self.result = False
+            else:
+                self.result = True
