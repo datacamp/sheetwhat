@@ -6,7 +6,7 @@ from protowhat import selectors
 from protowhat.Test import Test
 from protowhat.Feedback import Feedback
 
-from sheetwhat.utils import is_empty, dict_keys, normalize_formula
+from sheetwhat.utils import is_empty
 
 
 class SolutionBasedTest(Test, ABC):
@@ -14,6 +14,11 @@ class SolutionBasedTest(Test, ABC):
         super().__init__(feedback)
         self.student_data = student_data
         self.solution_data = solution_data
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}:" \
+            f"student data = {self.student_data}" \
+            f"solution data = {self.solution_data}"
 
 
 def array_element_tests(test, student_data, solution_data, feedback, *args, **kwargs):
@@ -39,7 +44,7 @@ def array_element_tests(test, student_data, solution_data, feedback, *args, **kw
                 element_solution_data,
                 item_feedback,
                 *args,
-                **kwargs
+                **kwargs,
             )
         )
     return tests
