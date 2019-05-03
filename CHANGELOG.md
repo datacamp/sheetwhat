@@ -2,6 +2,12 @@
 
 All notable changes to the sheetwhat project will be documented in this file.
 
+## 0.5.0
+
+- Add `_debug` SCT introspection function
+- Normalize conditional format custom formula
+- Use `Test` to replace `Rule` in check implementations
+
 ## 0.1.5
 
 - Fix setup
