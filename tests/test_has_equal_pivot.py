@@ -11,6 +11,7 @@ from tests.helper import (
 )
 from sheetwhat.checks import has_equal_pivot
 
+
 # Fixtures
 @pytest.fixture()
 def pivot_tables():

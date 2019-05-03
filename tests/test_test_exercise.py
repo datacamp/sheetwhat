@@ -47,3 +47,25 @@ def test_success_msg(success_msg, patt):
 def test_malformed(sct, student_data, solution_data):
     with pytest.raises(AssertionError):
         te(sct, student_data, solution_data)
+
+
+def test_check_correct():
+    result = te(
+        sct=[
+            {
+                "range": "A1",
+                "sct": [
+                    """
+Ex().check_correct(
+    check=has_equal_value(),
+    diagnose=multi(check_operator(operator='-'))
+)
+"""
+                ],
+            }
+        ],
+        student_data={"values": [["1"]], "formulas": [["=1"]]},
+        solution_data={"values": [["1"]], "formulas": [["=3-2"]]},
+    )
+
+    assert result["correct"]

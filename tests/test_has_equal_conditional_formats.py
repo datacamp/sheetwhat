@@ -76,6 +76,38 @@ def conditional_format_2(conditional_format):
 
 
 @pytest.fixture()
+def conditional_format_custom_condition(conditional_format):
+    return [
+        *conditional_format,
+        {
+            "ranges": [
+                {
+                    "sheetId": "Sheet1",
+                    # A1:C4
+                    "endRowIndex": 4,
+                    "startRowIndex": 0,
+                    "endColumnIndex": 3,
+                    "startColumnIndex": 0,
+                }
+            ],
+            "booleanRule": {
+                "condition": {
+                    "type": "CUSTOM_FORMULA",
+                    "values": [{"userEnteredValue": "=SUM(A1:A14) \u003e 50"}],
+                },
+                "format": {
+                    "backgroundColor": {
+                        "red": 0.95686275,
+                        "green": 0.78039217,
+                        "blue": 0.7647059,
+                    }
+                },
+            },
+        },
+    ]
+
+
+@pytest.fixture()
 def solution_data(conditional_format):
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
@@ -90,6 +122,15 @@ def solution_data_2(conditional_format_2):
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
         "conditionalFormats": conditional_format_2,
+    }
+
+
+@pytest.fixture()
+def solution_data_custom_condition(conditional_format_custom_condition):
+    return {
+        "values": [[1, 1, 1], [1, 52, 8]],
+        "formulas": [["=0+1", 1, 1], ["=1+0", "=52", 8]],
+        "conditionalFormats": conditional_format_custom_condition,
     }
 
 
@@ -176,6 +217,54 @@ def test_has_equal_conditional_formats_3(solution_data_2, trans, correct, match)
     user_data = trans(deepcopy(solution_data_2))
     # sct_range is irrelevant in conditional formats
     s = setup_state(user_data, solution_data_2, "A1")
+    with verify_success(correct, match=match):
+        has_equal_conditional_formats(s)
+
+
+@pytest.mark.parametrize(
+    "trans, correct, match",
+    [
+        (Identity(), True, None),
+        (
+            Mutation(
+                [
+                    "conditionalFormats",
+                    1,
+                    "booleanRule",
+                    "condition",
+                    "values",
+                    0,
+                    "userEnteredValue",
+                ],
+                "=sum(A1:A14) \u003e 50",
+            ),
+            True,
+            None,
+        ),
+        (
+            Mutation(
+                [
+                    "conditionalFormats",
+                    1,
+                    "booleanRule",
+                    "condition",
+                    "values",
+                    0,
+                    "userEnteredValue",
+                ],
+                "=SUM(A1:A14)  \u003e 50",
+            ),
+            True,
+            None,
+        ),
+    ],
+)
+def test_has_equal_conditional_formats_custom_condition(
+    solution_data_custom_condition, trans, correct, match
+):
+    user_data = trans(deepcopy(solution_data_custom_condition))
+    # sct_range is irrelevant in conditional formats
+    s = setup_state(user_data, solution_data_custom_condition, "A1")
     with verify_success(correct, match=match):
         has_equal_conditional_formats(s)
 

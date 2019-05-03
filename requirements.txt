@@ -1,13 +1,13 @@
 # pkg deps
-protowhat==1.3.0
-attrs==18.2.0
-glom==18.3.1
+protowhat~=1.7.0
+attrs~=18.2.0
+glom~=18.3.1
 
 # test deps
-pytest==3.7.4
-codecov==2.0.15
-pytest-cov==2.5.1
+pytest~=3.7.4
+codecov~=2.0.15
+pytest-cov~=2.5.1
 
 # doc deps
-sphinx==1.7.7
-sphinx_rtd_theme==v0.4.1
+sphinx~=1.7.7
+sphinx_rtd_theme~=0.4.1
