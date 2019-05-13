@@ -16,6 +16,7 @@ class State(BaseState):
         self.sct_range = sct_range
         self.reporter = reporter
         self.messages = []
+        self.creator = None
         self.dispatcher = Dispatcher()
         self.node_name = "root"
         self.force_diagnose = force_diagnose
