@@ -1,5 +1,5 @@
 # pkg deps
-protowhat~=1.7.0
+protowhat~=1.8.0
 attrs~=18.2.0
 glom~=18.3.1
 
