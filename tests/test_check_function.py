@@ -23,36 +23,13 @@ def user_data_normalize():
     }
 
 
-@pytest.mark.parametrize(
-    "sct_range, function, index, correct",
-    [
-        ("A1", "SUM", 0, True),      # 1
-        ("A1", "TEST", 0, False),    # 0
-        ("A1", "SUM", 1, True),      # 1
-        ("A1", "SUM", 2, False),     # 0
-        ("A1", "TEST", 1, False),    # 0
-        ("B2", "MEDIAN", 0, True),   # 1
-        ("B2", "MEDIAN", 1, True),   # 1
-        ("B2", "MEDIAN", 2, False),  # 0
-        ("B2", "TEST", 0, False),    # 0
-        ("B2", "TEST", 1, False),    # 0
-        ("B2", "TEST", 2, False),    # 0
-        ("B2", "SUM", 0, False),     # 0
-    ]
-)
-def test_check_function_index(user_data_index, sct_range, function, index, correct):
-    s = setup_state(user_data_index, user_data_index, sct_range)
-    with verify_success(correct):
-        check_function(s, name=function, index=index)
-
-
 @pytest.fixture()
 def user_data_index():
     return {
         "values": [[1, 1, 1], [1, 52, 8]],
         "formulas": [
             ["=SUM(A1) + SUM(A1)", 1, 1],
-            ["AVERAGE($C$2) + AVERAGE($C$2)", "MEDIAN(B2:C5) + MEDIAN(B2:C5)"]
+            ["=    aVeRaGe($C$2) + average($C$2)", "=MEDIAN(B2:C5) + MEDIAN(B2:C5)"]
         ],
     }
 # Tests
@@ -95,3 +72,29 @@ def test_check_function_normalize(user_data_normalize, sct_range, function, corr
     s = setup_state(user_data_normalize, user_data_normalize, sct_range)
     with verify_success(correct):
         check_function(s, name=function)
+
+
+@pytest.mark.parametrize(
+    "sct_range, function, index, correct",
+    [
+        ("A1", "SUM", 0, True),       # 1
+        ("A1", "TEST", 0, False),     # 0
+        ("A1", "SUM", 1, True),       # 1
+        ("A1", "SUM", 2, False),      # 0
+        ("A1", "TEST", 1, False),     # 0
+        ("A2", "AVERAGE", 0, True),   # 1
+        ("A2", "AVERAGE", 1, True),   # 1
+        ("A2", "AVERAGE", 2, False),  # 0
+        ("B2", "MEDIAN", 0, True),    # 1
+        ("B2", "MEDIAN", 1, True),    # 1
+        ("B2", "MEDIAN", 2, False),   # 0
+        ("B2", "TEST", 0, False),     # 0
+        ("B2", "TEST", 1, False),     # 0
+        ("B2", "TEST", 2, False),     # 0
+        ("B2", "SUM", 0, False),      # 0
+    ]
+)
+def test_check_function_index(user_data_index, sct_range, function, index, correct):
+    s = setup_state(user_data_index, user_data_index, sct_range)
+    with verify_success(correct):
+        check_function(s, name=function, index=index)

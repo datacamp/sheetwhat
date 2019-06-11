@@ -24,15 +24,12 @@ def check_range(state, field, field_msg, missing_msg=None):
     )
 
 
-def has_code(state, pattern, fixed=False, index=0, incorrect_msg=None, normalize=lambda x: x):
+def has_code(state, pattern, fixed=False, incorrect_msg=None, normalize=lambda x: x):
     child = check_range(state, field="formulas", field_msg="formula")
 
     def match(on_text):
         if fixed:
-            if index == 0:
-                return normalize(pattern) in str(on_text)
-            else:
-                return len(re.findall(normalize(pattern), str(on_text))) >= (index + 1)
+            return normalize(pattern) in str(on_text)
         else:
             return re.search(pattern, str(on_text)) is not None
 
@@ -53,11 +50,16 @@ def check_function(state, name, index=0, missing_msg=None):
         missing_msg or "In cell `{range}`, did you use the `{name}()` function?"
     ).format(name=name, **state.to_message_exposed_dict())
 
+    # construct regex pattern
+    pattern = "(?:{pattern}.*){{{index}}}".format(
+        pattern=normalize_formula(name),
+        index=index + 1
+    )
+
     has_code(
         state,
-        pattern=name,
-        fixed=True,
-        index=index,
+        pattern=pattern,
+        fixed=False,
         incorrect_msg=missing_msg,
         normalize=normalize_formula,
     )
