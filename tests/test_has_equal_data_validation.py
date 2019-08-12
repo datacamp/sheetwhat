@@ -23,6 +23,242 @@ def user_data_seed():
     }
 
 
+@pytest.fixture()
+def failing_solution_data():
+    return {
+        "dataValidations": [
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+        ]
+    }
+
+
+@pytest.fixture()
+def failing_user_data():
+    return {
+        "dataValidations": [
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            None,
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+            [
+                {
+                    "condition": {
+                        "type": "ONE_OF_RANGE",
+                        "values": [{"userEnteredValue": "=Dates"}],
+                    },
+                    "inputMessage": "Select a date from the list to see Opening and Closing prices.",
+                    "showCustomUi": True,
+                    "strict": True,
+                }
+            ],
+        ]
+    }
+
+
 # Tests
 @pytest.mark.parametrize(
     "trans, sct_range, correct, match",
@@ -62,3 +298,9 @@ def test_has_equal_data_validation(user_data_seed, trans, sct_range, correct, ma
     s = setup_state(user_data, user_data_seed, sct_range)
     with verify_success(correct, match=match):
         has_equal_data_validation(s)
+
+
+@pytest.mark.debug
+def test_failing(failing_solution_data, failing_user_data):
+    s = setup_state(failing_user_data, failing_solution_data, "A18")
+    has_equal_data_validation(s)
