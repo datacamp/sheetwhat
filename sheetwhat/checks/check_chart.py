@@ -84,8 +84,8 @@ def has_equal_title(state):
     selector = state_selector(state)
     state.do_tests(
         [
-            EqualityTest(*selector("title"), "the title is not correct."),
-            EqualityTest(*selector("subtitle"), "the subtitle is not correct."),
+            EqualityTest(*selector("title"), "The title is not correct."),
+            EqualityTest(*selector("subtitle"), "The subtitle is not correct."),
         ]
     )
     return state
@@ -97,7 +97,7 @@ def has_equal_domain(state):
         state.do_test(
             EqualityTest(
                 *state_selector(state)(domain_path[state.node_name]),
-                "the X-axis is not correct.",
+                "The X-axis is not correct.",
             )
         )
     return state
