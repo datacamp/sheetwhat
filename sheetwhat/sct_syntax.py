@@ -12,7 +12,7 @@ sct_dict = {
     if k not in builtins.__dict__
     if not k.startswith("__")
 }
-SCT_CTX = create_sct_context(State, sct_dict)
+SCT_CTX = create_sct_context(sct_dict)
 
 # used in test_exercise, so that scts without Ex() don't run immediately
 globals().update(SCT_CTX)
