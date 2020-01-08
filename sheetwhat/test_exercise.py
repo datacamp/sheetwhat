@@ -1,4 +1,4 @@
-from protowhat.failure import Failure
+from protowhat.failure import Failure, InstructorError
 from protowhat.Reporter import Reporter
 
 from sheetwhat.sct_syntax import SCT_CTX
@@ -15,13 +15,13 @@ def test_exercise(
     assert isinstance(student_data, dict)
     assert isinstance(solution_data, dict)
 
-    rep = Reporter()
+    reporter = Reporter()
     for single_sct in sct:
         state = State(
             student_data=student_data,
             solution_data=solution_data,
             sct_range=single_sct.get("range"),
-            reporter=rep,
+            reporter=reporter,
             force_diagnose=force_diagnose
         )
 
@@ -29,10 +29,13 @@ def test_exercise(
 
         try:
             exec("\n".join(single_sct.get("sct", [])), SCT_CTX)
-        except TestFail as tf:
-            return tf.payload
+        except Failure as e:
+            if isinstance(e, InstructorError):
+                # TODO: decide based on context
+                raise e
+            return reporter.build_failed_payload(e.feedback)
 
     if success_msg and isinstance(success_msg, str):
-        rep.success_msg = success_msg
+        reporter.success_msg = success_msg
 
-    return rep.build_final_payload()
+    return reporter.build_final_payload()
