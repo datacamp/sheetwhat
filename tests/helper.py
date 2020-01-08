@@ -6,7 +6,7 @@ import json
 from sheetwhat.State import State
 from sheetwhat.sct_syntax import SCT_CTX
 from protowhat.Reporter import Reporter
-from protowhat.Test import TestFail as TF
+from protowhat.failure import TestFail as TF
 
 from functools import reduce
 from copy import deepcopy

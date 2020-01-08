@@ -1,4 +1,4 @@
-from protowhat.Test import TestFail
+from protowhat.failure import Failure
 from protowhat.Reporter import Reporter
 
 from sheetwhat.sct_syntax import SCT_CTX
