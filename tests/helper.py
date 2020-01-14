@@ -1,12 +1,12 @@
-import requests
 import pytest
 import json
 
-
-from sheetwhat.State import State
-from sheetwhat.sct_syntax import SCT_CTX
-from protowhat.Reporter import Reporter
 from protowhat.failure import TestFail as TF
+from protowhat.Reporter import Reporter
+
+from sheetwhat import checks
+from sheetwhat.State import State
+from sheetwhat.sct_context import SCT_CTX
 
 from functools import reduce
 from copy import deepcopy

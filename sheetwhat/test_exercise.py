@@ -1,7 +1,8 @@
 from protowhat.failure import Failure, InstructorError
 from protowhat.Reporter import Reporter
+from protowhat.sct_context import get_checks_dict, create_sct_context
 
-from sheetwhat.sct_syntax import SCT_CTX
+from sheetwhat import checks
 from sheetwhat.State import State
 
 
@@ -16,19 +17,29 @@ def test_exercise(
     assert isinstance(solution_data, dict)
 
     reporter = Reporter()
+
+    # the available SCT methods
+    sct_dict = get_checks_dict(checks)
+
+    # the available global variables
+    sct_context = create_sct_context(sct_dict)
+    Ex = sct_context["Ex"]
+
     for single_sct in sct:
-        state = State(
-            student_data=student_data,
-            solution_data=solution_data,
-            sct_range=single_sct.get("range"),
-            reporter=reporter,
-            force_diagnose=force_diagnose
-        )
-
-        SCT_CTX["Ex"].root_state = state
-
         try:
-            exec("\n".join(single_sct.get("sct", [])), SCT_CTX)
+            state = State(
+                student_data=student_data,
+                solution_data=solution_data,
+                sct_range=single_sct.get("range"),
+                reporter=reporter,
+                force_diagnose=force_diagnose,
+            )
+
+            # setting manually to not run create_sct_context in loop
+            Ex.root_state = state
+
+            exec("\n".join(single_sct.get("sct", [])), sct_context)
+
         except Failure as e:
             if isinstance(e, InstructorError):
                 # TODO: decide based on context
