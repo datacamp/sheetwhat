@@ -1,7 +1,8 @@
-from protowhat.Test import TestFail
+from protowhat.failure import Failure, InstructorError
 from protowhat.Reporter import Reporter
+from protowhat.sct_context import get_checks_dict, create_sct_context
 
-from sheetwhat.sct_syntax import SCT_CTX
+from sheetwhat import checks
 from sheetwhat.State import State
 
 
@@ -15,24 +16,37 @@ def test_exercise(
     assert isinstance(student_data, dict)
     assert isinstance(solution_data, dict)
 
-    rep = Reporter()
+    reporter = Reporter()
+
+    # the available SCT methods
+    sct_dict = get_checks_dict(checks)
+
+    # the available global variables
+    sct_context = create_sct_context(sct_dict)
+    Ex = sct_context["Ex"]
+
     for single_sct in sct:
-        state = State(
-            student_data=student_data,
-            solution_data=solution_data,
-            sct_range=single_sct.get("range"),
-            reporter=rep,
-            force_diagnose=force_diagnose
-        )
-
-        SCT_CTX["Ex"].root_state = state
-
         try:
-            exec("\n".join(single_sct.get("sct", [])), SCT_CTX)
-        except TestFail as tf:
-            return tf.payload
+            state = State(
+                student_data=student_data,
+                solution_data=solution_data,
+                sct_range=single_sct.get("range"),
+                reporter=reporter,
+                force_diagnose=force_diagnose,
+            )
+
+            # setting manually to not run create_sct_context in loop
+            Ex.root_state = state
+
+            exec("\n".join(single_sct.get("sct", [])), sct_context)
+
+        except Failure as e:
+            if isinstance(e, InstructorError):
+                # TODO: decide based on context
+                raise e
+            return reporter.build_failed_payload(e.feedback)
 
     if success_msg and isinstance(success_msg, str):
-        rep.success_msg = success_msg
+        reporter.success_msg = success_msg
 
-    return rep.build_final_payload()
+    return reporter.build_final_payload()

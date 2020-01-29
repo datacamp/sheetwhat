@@ -1,5 +1,6 @@
 from functools import partial
 from protowhat import selectors
+from protowhat.Feedback import FeedbackComponent
 
 from sheetwhat.selectors import state_selector, Dispatcher
 from ..utils import range_to_row_columns, row_columns_to_range
@@ -144,12 +145,12 @@ def has_equal_series(state):
             array_element_tests(
                 EqualityTest,
                 *selector(series_path[state.node_name].get("source")),
-                state.build_message("the {ordinal} series' source is not correct."),
+                FeedbackComponent("the {ordinal} series' source is not correct."),
             )
             + array_element_tests(
                 EqualityTest,
                 *selector(series_path[state.node_name].get("color")),
-                state.build_message("the {ordinal} series' color is not correct."),
+                FeedbackComponent("the {ordinal} series' color is not correct."),
             )
         )
     return state
