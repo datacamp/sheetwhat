@@ -4,7 +4,7 @@ from abc import ABC
 
 from protowhat import selectors
 from protowhat.Test import Test
-from protowhat.Feedback import Feedback
+from protowhat.Feedback import FeedbackComponent
 
 from sheetwhat.utils import is_empty
 
@@ -16,21 +16,23 @@ class SolutionBasedTest(Test, ABC):
         self.solution_data = solution_data
 
     def __repr__(self):
-        return f"{self.__class__.__name__}:" \
-            f"student data = {self.student_data}" \
+        return (
+            f"{self.__class__.__name__}:"
+            f"student data = {self.student_data}"
             f"solution data = {self.solution_data}"
+        )
 
 
 def array_element_tests(test, student_data, solution_data, feedback, *args, **kwargs):
     tests = []
     if not isinstance(student_data, list) or not isinstance(solution_data, list):
-        # If student data is None; Feedback will be provided by a different test.
+        # If student data is None; FeedbackComponent will be provided by a different test.
         return tests
     for i, (element_student_data, element_solution_data) in enumerate(
         zip(student_data, solution_data)
     ):
         if isinstance(feedback, str):
-            item_feedback = Feedback(feedback)
+            item_feedback = FeedbackComponent(feedback)
         else:
             item_feedback = copy.deepcopy(feedback)
         item_feedback.message = item_feedback.message.format(

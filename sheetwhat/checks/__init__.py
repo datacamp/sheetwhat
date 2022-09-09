@@ -27,4 +27,4 @@ from sheetwhat.checks.has_equal_conditional_formats import has_equal_conditional
 # - no check_file related functionality
 from protowhat.checks.check_logic import fail, multi, check_not, check_or, check_correct
 from protowhat.checks.check_simple import has_chosen, success_msg
-from protowhat.utils import _debug
+from protowhat.failure import _debug
