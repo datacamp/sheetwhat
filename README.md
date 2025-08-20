@@ -1,6 +1,3 @@
-> :warning: **This repo has outdated tokens in its travisci config**
-> To make new releases for this project it needs to be moved to circleci
-
 # sheetwhat
 
 [![PyPI version](https://badge.fury.io/py/sheetwhat.svg)](https://badge.fury.io/py/sheetwhat)
