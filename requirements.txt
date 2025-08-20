@@ -5,7 +5,6 @@ glom~=18.3.1
 
 # test deps
 pytest~=8.1.1
-# codecov~=2.0.15
 pytest-cov~=6.1.1
 
 # doc deps
