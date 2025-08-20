@@ -1,12 +1,12 @@
 # pkg deps
-protowhat~=2.0.1
+protowhat~=2.3.1
 attrs~=18.2.0
 glom~=18.3.1
 
 # test deps
-pytest~=3.7.4
-codecov~=2.0.15
-pytest-cov~=2.5.1
+pytest~=8.1.1
+# codecov~=2.0.15
+pytest-cov~=6.1.1
 
 # doc deps
 sphinx~=1.7.7
