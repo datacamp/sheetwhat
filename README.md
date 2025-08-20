@@ -1,9 +1,5 @@
-> :warning: **This repo has outdated tokens in its travisci config**
-> To make new releases for this project it needs to be moved to circleci
-
 # sheetwhat
 
-[![Build Status](https://travis-ci.org/datacamp/sheetwhat.svg?branch=master)](https://travis-ci.org/datacamp/sheetwhat)
 [![codecov](https://codecov.io/gh/datacamp/sheetwhat/branch/master/graph/badge.svg)](https://codecov.io/gh/datacamp/sheetwhat)
 [![PyPI version](https://badge.fury.io/py/sheetwhat.svg)](https://badge.fury.io/py/sheetwhat)
 [![Documentation Status](https://readthedocs.org/projects/sheetwhat/badge/?version=latest)](https://sheetwhat.readthedocs.io/en/latest/?badge=latest)
